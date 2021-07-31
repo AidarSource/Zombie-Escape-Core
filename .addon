@@ -1,0 +1,22 @@
+{
+	"name": "ZombieEscape",
+	"version": "1.0",
+	"sharedassets": "*.*",
+	"type": "game",
+	"ident": "sandbox.ze",
+	
+	"depends":
+	[
+		"base",
+		"rust"
+	],
+	
+	"gamemodes":
+	[
+		{
+			"name": "Zombie Escape",
+			"title": "Zombie Escape",
+			"description": "ZombieEscape"
+		}
+	]
+}
