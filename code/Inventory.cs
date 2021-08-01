@@ -9,6 +9,17 @@ partial class Inventory : BaseInventory
 
 	}
 
+	public override bool CanAdd( Entity entity )
+	{
+		if ( !entity.IsValid() )
+			return false;
+
+		if ( !base.CanAdd( entity ) )
+			return false;
+
+		return !IsCarryingType( entity.GetType() );
+	}
+
 	public override bool Add( Entity entity, bool makeActive = false )
 	{
 		if ( !entity.IsValid() )
