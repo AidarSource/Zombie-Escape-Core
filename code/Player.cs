@@ -3,7 +3,16 @@
 
 partial class ZePlayer : Player
 {
+	[Net, Predicted] public ICamera MainCamera { get; set; }
 
+	public ICamera LastCamera { get; set; }
+	public override void Spawn()
+	{
+		MainCamera = new FirstPersonCamera();
+		LastCamera = MainCamera;
+
+		base.Spawn();
+	}
 
 	public override void Respawn()
 	{
@@ -16,7 +25,8 @@ partial class ZePlayer : Player
 		Animator = new StandardPlayerAnimator();
 
 		// Use FirstPersonCamera (you can make your own Camera for 100% control)
-		Camera = new FirstPersonCamera();
+		MainCamera = LastCamera;
+		Camera = MainCamera;
 
 
 		EnableAllCollisions = true;
