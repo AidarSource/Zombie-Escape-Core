@@ -149,6 +149,7 @@ public partial class Weapon : BaseWeapon, IUse
 		forward += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) * spread * 0.25f;
 		forward = forward.Normal;
 
+
 		//
 		// ShootBullet is coded in a way where we can have bullets pass through shit
 		// or bounce off shit, in which case it'll return multiple results
@@ -172,6 +173,10 @@ public partial class Weapon : BaseWeapon, IUse
 
 				tr.Entity.TakeDamage( damageInfo );
 			}
+			// temporary knock back
+			if ( tr.Entity.GetType() == typeof( ZePlayer ) )
+				tr.Entity.Velocity = forward * 300;
+				tr.Entity.Health = 100;
 		}
 	}
 
