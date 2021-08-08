@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-
+using System;
 
 partial class ZePlayer : Player
 {
@@ -8,12 +8,13 @@ partial class ZePlayer : Player
 
 	[Net, Predicted] public ICamera MainCamera { get; set; }
 
-	public ICamera LastCamera { get; set; }
+	public ICamera LastCamera { get; set; } 
 
 	// Set Inventory to Player object
 	public ZePlayer()
 	{
 		Inventory = new Inventory( this );
+
 	}
 
 	public override void Spawn()
@@ -38,13 +39,19 @@ partial class ZePlayer : Player
 		MainCamera = LastCamera;
 		Camera = MainCamera;
 
+		// Auto bhop = true
+		(Controller as WalkController).AutoJump = true;
+
 
 		EnableAllCollisions = true;
 		EnableDrawing = true;
 		EnableHideInFirstPerson = true;
 		EnableShadowInFirstPerson = true;
 
+
+
 		Inventory.Add( new Pistol(), true );
+		Inventory.Add( new SMG() );
 
 		base.Respawn();
 	}
@@ -52,6 +59,21 @@ partial class ZePlayer : Player
 	public override void Simulate( Client cl )
 	{
 		base.Simulate( cl );
+
+		//if ( Input.Pressed( InputButton.Use ) )
+		//{
+		//	DebugOverlay.ScreenText( "Use", 1.0f );
+
+		//	if ( IsServer )
+		//	{
+		//		var Test1 = Position;
+
+		//		Test1.y -= 200;
+
+		//		MoveTo( Test1, 1.0f );
+		//	}
+		//}
+
 
 		// Show current item in Inventory
 		if ( Input.ActiveChild != null )
@@ -93,15 +115,76 @@ partial class ZePlayer : Player
 		}
 
 		// Press two times space for Noclip
-		if ( Input.Released( InputButton.Jump ) )
-		{
-			if ( timeSinceJumpReleased < 0.3f )
-			{
-				Game.Current?.DoPlayerNoclip( cl );
-			}
+		//if ( Input.Released( InputButton.Jump ) )
+		//{
+		//	if ( timeSinceJumpReleased < 0.3f )
+		//	{
+		//		Game.Current?.DoPlayerNoclip( cl );
+		//	}
 
-			timeSinceJumpReleased = 0;
+		//	timeSinceJumpReleased = 0;
+		//}
+	}
+
+	DamageInfo LastDamage;
+
+	public override void TakeDamage( DamageInfo info )
+	{
+		LastDamage = info;
+
+		// hack - hitbox 0 is head
+		// we should be able to get this from somewhere
+		if ( info.HitboxIndex == 0 )
+		{
+			info.Damage *= 2.0f;
+		}
+
+		base.TakeDamage( info );
+
+		if ( info.Attacker is ZePlayer attacker && attacker != this )
+		{
+			// Note - sending this only to the attacker!
+			//attacker.DidDamage( To.Single( attacker ), info.Position, info.Damage, Health.LerpInverse( 100, 0 ) );
+
+			TookDamage( To.Single( this ), info.Weapon.IsValid() ? info.Weapon.Position : info.Attacker.Position );
+			if ( IsServer )
+			{
+				var Test1 = Position;
+				Test1 = Test1.Normal;
+				Test1.x += 5;
+				Velocity = Test1 += 3;
+
+				//var Test2 = Position;
+				//Test2 = Test2.Normal;
+				//Velocity = Test2 -= 10;
+
+				DebugOverlay.ScreenText( "info.Attacker.Position", 2.0f );
+
+
+				//MoveTo( Test1, 0.1f );
+			}
 		}
 	}
+
+	[ClientRpc]
+	public void TookDamage( Vector3 pos )
+	{
+		//var forward = Owner.EyeRot.Forward;
+		//forward = forward.Normal;
+
+		//Controller.Velocity = 1000.4f;
+		//Owner.Velocity = pos * 200;
+		DamageIndicator.Current?.OnHit( pos );
+		//if ( IsServer )
+		//{
+		//	var Test1 = Position;
+
+		//	Test1.y -= 200;
+
+		//	MoveTo( Test1, 1.0f );
+		//}
+	}
+
+
 }
 
