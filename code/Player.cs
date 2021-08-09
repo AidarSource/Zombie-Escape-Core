@@ -5,7 +5,7 @@ partial class ZePlayer : Player
 {
 	private TimeSince timeSinceDropped;
 	private TimeSince timeSinceJumpReleased;
-
+	private bool IsZombie = false;
 	[Net, Predicted] public ICamera MainCamera { get; set; }
 
 	public ICamera LastCamera { get; set; } 
@@ -35,6 +35,7 @@ partial class ZePlayer : Player
 		// Use StandardPlayerAnimator  (you can make your own PlayerAnimator for 100% control)
 		Animator = new StandardPlayerAnimator();
 
+
 		// Use FirstPersonCamera (you can make your own Camera for 100% control)
 		MainCamera = LastCamera;
 		Camera = MainCamera;
@@ -52,6 +53,7 @@ partial class ZePlayer : Player
 
 		Inventory.Add( new Pistol(), true );
 		Inventory.Add( new SMG() );
+		Inventory.Add( new Knife() );
 
 		base.Respawn();
 	}
@@ -59,21 +61,6 @@ partial class ZePlayer : Player
 	public override void Simulate( Client cl )
 	{
 		base.Simulate( cl );
-
-		//if ( Input.Pressed( InputButton.Use ) )
-		//{
-		//	DebugOverlay.ScreenText( "Use", 1.0f );
-
-		//	if ( IsServer )
-		//	{
-		//		var Test1 = Position;
-
-		//		Test1.y -= 200;
-
-		//		MoveTo( Test1, 1.0f );
-		//	}
-		//}
-
 
 		// Show current item in Inventory
 		if ( Input.ActiveChild != null )
@@ -132,6 +119,15 @@ partial class ZePlayer : Player
 	{
 		LastDamage = info;
 
+		if (!IsZombie && info.Weapon is Knife)
+		{
+			IsZombie = true;
+			Sound.FromEntity( "zm_infect", this );
+			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
+		}
+
+
+
 		// hack - hitbox 0 is head
 		// we should be able to get this from somewhere
 		if ( info.HitboxIndex == 0 )
@@ -147,42 +143,13 @@ partial class ZePlayer : Player
 			//attacker.DidDamage( To.Single( attacker ), info.Position, info.Damage, Health.LerpInverse( 100, 0 ) );
 
 			TookDamage( To.Single( this ), info.Weapon.IsValid() ? info.Weapon.Position : info.Attacker.Position );
-			if ( IsServer )
-			{
-				var Test1 = Position;
-				Test1 = Test1.Normal;
-				Test1.x += 5;
-				Velocity = Test1 += 3;
-
-				//var Test2 = Position;
-				//Test2 = Test2.Normal;
-				//Velocity = Test2 -= 10;
-
-				DebugOverlay.ScreenText( "info.Attacker.Position", 2.0f );
-
-
-				//MoveTo( Test1, 0.1f );
-			}
 		}
 	}
 
 	[ClientRpc]
 	public void TookDamage( Vector3 pos )
 	{
-		//var forward = Owner.EyeRot.Forward;
-		//forward = forward.Normal;
-
-		//Controller.Velocity = 1000.4f;
-		//Owner.Velocity = pos * 200;
 		DamageIndicator.Current?.OnHit( pos );
-		//if ( IsServer )
-		//{
-		//	var Test1 = Position;
-
-		//	Test1.y -= 200;
-
-		//	MoveTo( Test1, 1.0f );
-		//}
 	}
 
 
