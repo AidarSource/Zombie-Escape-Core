@@ -119,7 +119,6 @@ partial class ZePlayer : Player
 		//}
 	}
 
-	Client cl;
 	DamageInfo LastDamage;
 
 	public override void TakeDamage( DamageInfo info )
