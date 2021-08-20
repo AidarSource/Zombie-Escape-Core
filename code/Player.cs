@@ -1,4 +1,5 @@
 ﻿using Sandbox;
+using Sandbox.UI;
 using System;
 
 partial class ZePlayer : Player
@@ -101,6 +102,11 @@ partial class ZePlayer : Player
 			}
 		}
 
+		if (GroundEntity != null)
+		{
+			DebugOverlay.ScreenText( "Ground" );
+		}
+
 		// Press two times space for Noclip
 		//if ( Input.Released( InputButton.Jump ) )
 		//{
@@ -113,6 +119,7 @@ partial class ZePlayer : Player
 		//}
 	}
 
+	Client cl;
 	DamageInfo LastDamage;
 
 	public override void TakeDamage( DamageInfo info )

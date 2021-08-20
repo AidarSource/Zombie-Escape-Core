@@ -3,6 +3,8 @@
 public partial class Weapon : BaseWeapon, IUse
 {
 	public virtual float ReloadTime => 3.0f;
+	private float ZombieKnockback = 300.0f;
+	private float ZombieOnAirKnockback = 5.0f;
 
 	public PickupTrigger PickupTrigger { get; protected set; }
 
@@ -173,10 +175,27 @@ public partial class Weapon : BaseWeapon, IUse
 
 				tr.Entity.TakeDamage( damageInfo );
 			}
+
 			// temporary knock back
 			if ( tr.Entity.GetType() == typeof( ZePlayer ) )
-				tr.Entity.Velocity = forward * 300;
+			{
+				if ( tr.Entity.GroundEntity == null )
+				{
+					Log.Info( GroundEntity + "2" );
+					tr.Entity.Velocity = forward * (100 * ZombieOnAirKnockback);
+					DebugOverlay.ScreenText( ZombieOnAirKnockback.ToString() );
+					tr.Entity.Health = 100;
+					return;
+				}
+
+				DebugOverlay.ScreenText( 2, ZombieKnockback.ToString() );
 				tr.Entity.Health = 100;
+				tr.Entity.Velocity = forward * ZombieKnockback;
+				tr.Entity.Health = 100;
+			}
+
+			//DebugOverlay.ScreenText( tr.Entity.GetType(), 1.0f );
+			Log.Info( tr.Entity.GetType() );
 		}
 	}
 
@@ -199,6 +218,27 @@ public partial class Weapon : BaseWeapon, IUse
 		for ( int i = 0; i < numBullets; i++ )
 		{
 			ShootBullet( pos, dir, spread, force / numBullets, damage, bulletSize );
+		}
+	}
+
+	public virtual void MeleeStrike( float damage, float force )
+	{
+		var forward = Owner.EyeRot.Forward;
+		forward = forward.Normal;
+		var MeleeDistance = 80;
+		foreach ( var tr in TraceBullet( Owner.EyePos, Owner.EyePos + forward * MeleeDistance, 10f ) )
+		{
+			if ( !tr.Entity.IsValid() ) continue;
+			tr.Surface.DoBulletImpact( tr );
+			if ( !IsServer ) continue;
+			using ( Prediction.Off() )
+			{
+				var damageInfo = DamageInfo.FromBullet( tr.EndPos, forward * 110 * force, damage )
+					.UsingTraceResult( tr )
+					.WithAttacker( Owner )
+					.WithWeapon( this );
+				tr.Entity.TakeDamage( damageInfo );
+			}
 		}
 	}
 }
