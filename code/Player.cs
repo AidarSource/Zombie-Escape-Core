@@ -104,7 +104,7 @@ partial class ZePlayer : Player
 
 		if (GroundEntity != null)
 		{
-			DebugOverlay.ScreenText( "Ground" );
+			DebugOverlay.ScreenText(1, "Ground" );
 		}
 
 		// Press two times space for Noclip
