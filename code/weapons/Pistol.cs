@@ -18,10 +18,10 @@ partial class Pistol : Weapon
 		SetModel( "weapons/rust_pistol/rust_pistol.vmdl" );
 	}
 
-	public override bool CanPrimaryAttack()
-	{
-		return base.CanPrimaryAttack() && Input.Pressed( InputButton.Attack1 );
-	}
+	//public override bool CanPrimaryAttack()
+	//{
+	//	return base.CanPrimaryAttack() && Input.Pressed( InputButton.Attack1 );
+	//}
 
 	public override void AttackPrimary()
 	{
@@ -32,6 +32,7 @@ partial class Pistol : Weapon
 		ShootEffects();
 		PlaySound( "rust_pistol.shoot" );
 		ShootBullet( 0.05f, 1.5f, 9.0f, 3.0f );
+
 	}
 
 	private void Discharge()
@@ -47,7 +48,7 @@ partial class Pistol : Weapon
 
 		ShootEffects();
 		PlaySound( "rust_pistol.shoot" );
-		ShootBullet( pos, rot.Forward, 0.05f, 1.5f, 9.0f, 3.0f );
+		ShootBullet( pos, rot.Forward, 0.05f, 1.5f, 1.0f, 3.0f );
 
 		ApplyAbsoluteImpulse( rot.Backward * 200.0f );
 	}
