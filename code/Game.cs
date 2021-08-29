@@ -1,7 +1,13 @@
 ﻿using Sandbox;
+using System.Threading.Tasks;
+
 
 public partial class ZeCore : Game
 {
+	[Net] public float CounterToMotherZombie { get; set; } = 25.0f;
+	[Net] public bool OnlyOnce { get; set; } = false;
+	[Net] public bool IsZombie { get; set; } = false;
+
 	public ZeCore()
 	{
 		if ( IsServer )
@@ -23,5 +29,27 @@ public partial class ZeCore : Game
 	protected override void OnDestroy()
 	{
 		base.OnDestroy();
+	}
+
+	public async Task UI_MotherZombie()
+	{
+		if(OnlyOnce)
+		{
+			return;
+		}
+
+		OnlyOnce = true;
+
+		while ( true )
+		{
+			await GameTask.DelaySeconds( 1.0f );
+			CounterToMotherZombie--;
+			
+
+			if ( CounterToMotherZombie <= 0 )
+			{
+				return;
+			}
+		}
 	}
 }

@@ -1,12 +1,19 @@
 ﻿using Sandbox;
 using Sandbox.UI;
-using System;
+using System.Threading.Tasks;
+
 
 partial class ZePlayer : Player
 {
 	private TimeSince timeSinceDropped;
 	private TimeSince timeSinceJumpReleased;
-	private bool IsZombie = false;
+
+	private int counter = 20;
+
+	private TimeSince LocalTimeSince;
+
+	//private bool IsZombie = false;
+
 	[Net, Predicted] public ICamera MainCamera { get; set; }
 
 	public ICamera LastCamera { get; set; } 
@@ -15,15 +22,39 @@ partial class ZePlayer : Player
 	public ZePlayer()
 	{
 		Inventory = new Inventory( this );
-
 	}
+
+
+	public async void MZM()
+	{
+		await ((ZeCore)ZeCore.Current).UI_MotherZombie();
+
+		((ZeCore)ZeCore.Current).IsZombie = true;
+
+
+		Inventory.DeleteContents();
+
+		Controller = null;
+
+		EnableAllCollisions = false;
+		EnableDrawing = false;
+
+		await GameTask.DelaySeconds( 0.1f );
+		Respawn();
+		Sound.FromEntity( "zm_infect", this );
+		this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
+	}
+
 
 	public override void Spawn()
 	{
 		MainCamera = new FirstPersonCamera();
 		LastCamera = MainCamera;
 
+		MZM();
+
 		base.Spawn();
+
 	}
 
 	public override void Respawn()
@@ -35,7 +66,6 @@ partial class ZePlayer : Player
 
 		// Use StandardPlayerAnimator  (you can make your own PlayerAnimator for 100% control)
 		Animator = new StandardPlayerAnimator();
-
 
 		// Use FirstPersonCamera (you can make your own Camera for 100% control)
 		MainCamera = LastCamera;
@@ -51,10 +81,18 @@ partial class ZePlayer : Player
 		EnableShadowInFirstPerson = true;
 
 
+		if( ((ZeCore)ZeCore.Current).IsZombie )
+		{
+			Inventory.Add( new Knife(), true );
+			DebugOverlay.ScreenText( 9, "You're zombie!", 5.0f );
+		} else
+		{
+			DebugOverlay.ScreenText( 10, "You're human!", 5.0f );
+			Inventory.Add( new Pistol(), true );
+			Inventory.Add( new SMG() );
+			Inventory.Add( new Knife() );
+		}
 
-		Inventory.Add( new Pistol(), true );
-		Inventory.Add( new SMG() );
-		Inventory.Add( new Knife() );
 
 		base.Respawn();
 	}
@@ -62,6 +100,7 @@ partial class ZePlayer : Player
 	public override void Simulate( Client cl )
 	{
 		base.Simulate( cl );
+
 
 		// Show current item in Inventory
 		if ( Input.ActiveChild != null )
@@ -71,6 +110,7 @@ partial class ZePlayer : Player
 
 		if ( LifeState != LifeState.Alive )
 			return;
+
 
 
 		TickPlayerUse();
@@ -89,6 +129,10 @@ partial class ZePlayer : Player
 			}
 		}
 
+		if(Input.Pressed(InputButton.Flashlight))
+		{
+			Sound.FromEntity( "ayayo", this );
+		}
 
 		if ( Input.Pressed( InputButton.Drop ) )
 		{
@@ -106,7 +150,7 @@ partial class ZePlayer : Player
 		{
 			DebugOverlay.ScreenText(1, "Ground" );
 		}
-
+		
 		// Press two times space for Noclip
 		//if ( Input.Released( InputButton.Jump ) )
 		//{
@@ -119,15 +163,16 @@ partial class ZePlayer : Player
 		//}
 	}
 
+	
+
 	DamageInfo LastDamage;
 
 	public override void TakeDamage( DamageInfo info )
 	{
 		LastDamage = info;
-
-		if (!IsZombie && info.Weapon is Knife)
+		if (!((ZeCore)ZeCore.Current).IsZombie && info.Weapon is Knife)
 		{
-			IsZombie = true;
+			((ZeCore)ZeCore.Current).IsZombie = true;
 			Sound.FromEntity( "zm_infect", this );
 			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
 		}

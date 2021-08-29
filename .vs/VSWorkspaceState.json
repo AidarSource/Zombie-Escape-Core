@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\code"
+    "\\code",
+    "\\code\\weapons"
   ],
+  "SelectedNode": "\\code\\weapons\\Melee.cs",
   "PreviewInSolutionExplorer": false
 }

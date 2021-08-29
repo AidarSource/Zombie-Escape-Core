@@ -1,3 +1,20 @@
+MotherZM {
+	position: absolute;
+	background-color: rgba( black, 0.2 ); // opacity 0 background
+	left: 600px;
+	bottom: 800px;
+	font-size: 40px;
+	font-weight: bold;
+	color: orange;
+	height: 80px;
+	padding: 0 50px;
+	align-items: center;
+
+	&.hidden {
+		display: none;
+	}
+}
+
 Health
 {
 	position: absolute;

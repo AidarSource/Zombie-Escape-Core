@@ -20,5 +20,6 @@ public partial class SandboxHud : HudEntity<RootPanel>
 		RootPanel.AddChild<Scoreboard<ScoreboardEntry>>();
 		RootPanel.AddChild<Health>();
 		RootPanel.AddChild<InventoryBar>();
+		RootPanel.AddChild<MotherZM>();
 	}
 }
