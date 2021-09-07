@@ -48,7 +48,7 @@ partial class Pistol : Weapon
 
 		ShootEffects();
 		PlaySound( "rust_pistol.shoot" );
-		ShootBullet( pos, rot.Forward, 0.05f, 1.5f, 1.0f, 3.0f );
+		ShootBullet( pos, rot.Forward, 0.05f, 1.5f, 10.0f, 3.0f );
 
 		ApplyAbsoluteImpulse( rot.Backward * 200.0f );
 	}
