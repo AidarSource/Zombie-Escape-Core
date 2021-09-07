@@ -8,6 +8,14 @@ public partial class ZeCore : Game
 	[Net] public bool OnlyOnce { get; set; } = false;
 	[Net] public bool IsZombie { get; set; } = false;
 
+	[Net] public int Humans { get; set; } = 0;
+	[Net] public int Zombies { get; set; } = 0;
+
+
+	[Net] public string RoundResultText { get; set; } = "";
+	[Net] public int RoundCounter { get; set; } = 0;
+	[Net] public bool RoundStatusCheck { get; set; } = false;
+
 	public ZeCore()
 	{
 		if ( IsServer )
@@ -33,12 +41,12 @@ public partial class ZeCore : Game
 
 	public async Task UI_MotherZombie()
 	{
-		if(OnlyOnce)
-		{
-			return;
-		}
+		//if(OnlyOnce)
+		//{
+		//	return;
+		//}
 
-		OnlyOnce = true;
+		//OnlyOnce = true;
 
 		while ( true )
 		{
