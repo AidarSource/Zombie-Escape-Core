@@ -1,12 +1,33 @@
+RoundResult {
+	position: absolute;
+	background-color: rgba( black, 0.7 ); // opacity 0 background
+	left: 700px;
+	bottom: 800px;
+	font-size: 40px;
+	font-weight: bold;
+	color: aqua;
+	height: 80px;
+	padding: 0 50px;
+	align-items: center;
+
+	&.hidden {
+		display: none;
+	}
+}
+
+
 MotherZM {
 	position: absolute;
-	background-color: rgba( black, 0.2 ); // opacity 0 background
+	//background-color: rgba( black, 0.2 ); // opacity 0 background
+	background-image: url( /ui/blue-bg.png );
+	background-size: 100%;
+	background-repeat: no-repeat;
 	left: 600px;
 	bottom: 800px;
 	font-size: 40px;
 	font-weight: bold;
 	color: orange;
-	height: 80px;
+	height: 70px;
 	padding: 0 50px;
 	align-items: center;
 
