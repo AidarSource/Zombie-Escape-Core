@@ -185,13 +185,13 @@ public partial class Weapon : BaseWeapon, IUse
 					Log.Info( GroundEntity + "2" );
 					tr.Entity.Velocity = forward * (100 * ZombieOnAirKnockback);
 					DebugOverlay.ScreenText( ZombieOnAirKnockback.ToString() );
-					tr.Entity.Health = 70000;
+					//tr.Entity.Health = 70000;
 					return;
 				}
 
 				DebugOverlay.ScreenText( 2, ZombieKnockback.ToString() );
 				tr.Entity.Velocity = forward * ZombieKnockback;
-				tr.Entity.Health = 700000;
+				//tr.Entity.Health = 700000;
 			}
 
 			//DebugOverlay.ScreenText( tr.Entity.GetType(), 1.0f );
