@@ -25,34 +25,38 @@ partial class ZePlayer : Player
 	}
 
 
-	public async void MotherZombie()
-	{
+	//public async void MotherZombie()
+	//{
 		
-		await ((ZeCore)ZeCore.Current).UI_MotherZombie();
+	//	await ((ZeCore)ZeCore.Current).UI_MotherZombie();
 
-		IsZombie = true;
-
-
-		Inventory.DeleteContents();
+	//	//IsZombie = true;
+	//	Tags.Add( "zombie" );
 
 
-		await GameTask.DelaySeconds( 0.01f );
-		Respawn();
-		Health = 5000;
+	//	Inventory.DeleteContents();
 
-		((ZeCore)ZeCore.Current).Humans--;
-		((ZeCore)ZeCore.Current).Zombies++;
 
-		Sound.FromEntity( "zm_infect", this );
-		this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
-		((ZeCore)ZeCore.Current).RoundStatusCheck = true;
-	}
+	//	await GameTask.DelaySeconds( 0.01f );
+	//	Respawn();
+	//	Health = 5000;
+
+	//	((ZeCore)ZeCore.Current).Humans--;
+	//	//((ZeCore)ZeCore.Current).Zombies++;
+
+
+
+	//	Sound.FromEntity( "zm_infect", this );
+	//	//this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
+	//	((ZeCore)ZeCore.Current).RoundStatusCheck = true;
+	//}
 
 
 
 	public async void Infector()
 	{
-		IsZombie = true;
+		//IsZombie = true;
+		Tags.Add( "zombie" );
 		((ZeCore)ZeCore.Current).Humans--;
 		((ZeCore)ZeCore.Current).Zombies++;
 
@@ -68,7 +72,6 @@ partial class ZePlayer : Player
 	}
 
 
-
 	public override void Spawn()
 	{
 		MainCamera = new FirstPersonCamera();
@@ -77,23 +80,25 @@ partial class ZePlayer : Player
 		if( !((ZeCore)ZeCore.Current).OnlyOnce )
 		{
 			((ZeCore)ZeCore.Current).OnlyOnce = true;
-			MotherZombie();
+			//MotherZombie();
+			_ = ((ZeCore)ZeCore.Current).MotherZombie();
 		}
 
 		if( ((ZeCore)ZeCore.Current).CounterToMotherZombie == 0 )
 		{
-			IsZombie = true;
+			//IsZombie = true;
+			Tags.Add( "zombie" );
 			this.Health = 5000;
 		}
 
 
-		if(!IsZombie)
-		{
-			((ZeCore)ZeCore.Current).Humans++;
-		} else
-		{
-			((ZeCore)ZeCore.Current).Zombies++;
-		}
+		//if( !Tags.Has("zombie") )
+		//{
+		//	((ZeCore)ZeCore.Current).Humans++;
+		//} else
+		//{
+		//	((ZeCore)ZeCore.Current).Zombies++;
+		//}
 
 
 		base.Spawn();
@@ -124,8 +129,10 @@ partial class ZePlayer : Player
 		EnableShadowInFirstPerson = true;
 
 
-		if( IsZombie )
+
+		if( Tags.Has("zombie") )
 		{
+			((ZeCore)ZeCore.Current).Zombies++;
 			Inventory.Add( new Knife(), true );
 			DebugOverlay.ScreenText( 9, "You're zombie!", 5.0f );
 			this.Health = 5000;
@@ -133,9 +140,14 @@ partial class ZePlayer : Player
 		} else
 		{
 			DebugOverlay.ScreenText( 10, "You're human!", 5.0f );
+
+			((ZeCore)ZeCore.Current).Humans++;
+
 			Inventory.Add( new Pistol(), true );
 			Inventory.Add( new SMG() );
-			//Inventory.Add( new Knife() );
+
+			// basic citizen color
+			this.RenderColor = new Color32( 255, 255, 255, 255 );
 		}
 
 
@@ -161,6 +173,8 @@ partial class ZePlayer : Player
 		DebugOverlay.ScreenText( 4, "Zombies: " + ((ZeCore)ZeCore.Current).Zombies.ToString() );
 
 
+		
+
 		if ( ((ZeCore)ZeCore.Current).RoundStatusCheck )
 		{
 			if ( ((ZeCore)ZeCore.Current).RoundCounter == 0 && (((ZeCore)ZeCore.Current).Humans == 0 || ((ZeCore)ZeCore.Current).Zombies == 0) )
@@ -169,10 +183,14 @@ partial class ZePlayer : Player
 				if ( ((ZeCore)ZeCore.Current).Humans == 0 )
 				{
 					((ZeCore)ZeCore.Current).RoundResultText = "Zombies win the round";
+					((ZeCore)ZeCore.Current).ZombieWinRounds++;
+					_ = ((ZeCore)ZeCore.Current).RoundOver();
+					//_ = ((ZeCore)ZeCore.Current).MotherZombie();
 				}
 				else
 				{
 					((ZeCore)ZeCore.Current).RoundResultText = "Humans win the round";
+					((ZeCore)ZeCore.Current).HumanWinRounds++;
 				}
 			}
 		}
@@ -215,7 +233,7 @@ partial class ZePlayer : Player
 		{
 			DebugOverlay.ScreenText(1, "Ground" );
 		}
-		
+
 		// Press two times space for Noclip
 		//if ( Input.Released( InputButton.Jump ) )
 		//{
@@ -228,14 +246,14 @@ partial class ZePlayer : Player
 		//}
 	}
 
-	
+
 
 	DamageInfo LastDamage;
 
 	public override void TakeDamage( DamageInfo info )
 	{
 		LastDamage = info;
-		if (!IsZombie && info.Weapon is Knife)
+		if ( !Tags.Has("zombie") && info.Weapon is Knife)
 		{
 			Infector();
 		}
