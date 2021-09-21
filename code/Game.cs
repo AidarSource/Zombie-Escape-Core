@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 public partial class ZeCore : Game
 {
-	public List<string> LastRoundZombies_Collection;
+	//public List<string> LastRoundZombies_Collection;
+	public List<string> LastRoundZombies_Collection = new();
 	// ...
 	// Mother Zombie Variables
 	// ...
@@ -78,7 +79,16 @@ public partial class ZeCore : Game
 	public async Task MotherZombie()
 	{
 		await UI_MotherZombie();
+		
+		
 		int NumberZmToSpawn = (int)Math.Round( Client.All.Count * MotherZombie_SpawnRate );
+
+		List<string> LastRoundMZM = new();
+		LastRoundMZM = LastRoundZombies_Collection;
+
+		LastRoundZombies_Collection.Clear();
+
+
 
 		int Successfully_Spawned = 0;
 
@@ -89,15 +99,17 @@ public partial class ZeCore : Game
 			Random rand = new Random();
 			
 			var target = Client.All[rand.Next( Client.All.Count )];
-			if(target.Pawn.Tags.Has("zombie"))
+			if ( target.Pawn.Tags.Has( "zombie" ) || LastRoundMZM.Contains( target.ToString() ) )
 			{
-				continue; // avoid from random choosing same zombie
+				continue; // avoid from random choosing same zombie, or choosing last round MotherZombie
 			}
 
 			target.Pawn.Tags.Add( "zombie" );
 			Log.Info( target.ToString() );
-			LastRoundZombies_Collection.Add( target.ToString() );
 
+			Log.Info( LastRoundMZM );
+			
+			LastRoundZombies_Collection.Add( target.ToString() );
 			target.Pawn.Inventory.DeleteContents();
 			await GameTask.DelaySeconds( 0.0001f );
 
@@ -119,8 +131,6 @@ public partial class ZeCore : Game
 			}
 			target.Pawn.PlaySound( "zm_infect" );
 
-			//Sound.FromEntity( "zm_infect", this );
-			//this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
 			RoundStatusCheck = true;
 
 			Successfully_Spawned++;
