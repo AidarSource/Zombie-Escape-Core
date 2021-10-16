@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 public partial class ZeCore : Game
 {
-	//public List<string> LastRoundZombies_Collection;
 	public List<string> LastRoundZombies_Collection = new();
+	public List<string> LastLastRoundZombies_Collection = new();
 	// ...
 	// Mother Zombie Variables
 	// ...
-	[Net] public int CounterToMotherZombie { get; set; } = 25;
+	[Net] public int CounterToMotherZombie { get; set; } = 20;
 	[Net] public float MotherZombie_SpawnRate { get; set; } = 0.1f;
+	public byte CounterToClear_LastLastMZM_List = 0;
+	public bool ItsFirstRound = true;
 	[Net] public bool OnlyOnce { get; set; } = false;
 	[Net] public bool IsZombie { get; set; } = false;
 	// ...
@@ -83,12 +85,13 @@ public partial class ZeCore : Game
 		
 		int NumberZmToSpawn = (int)Math.Round( Client.All.Count * MotherZombie_SpawnRate );
 
-		List<string> LastRoundMZM = new();
-		LastRoundMZM = LastRoundZombies_Collection;
+		List<string> LastRoundMZM = new List<string>(LastRoundZombies_Collection);
+
+
+		List<string> LastLastRoundMZM = new List<string>(LastLastRoundZombies_Collection);
 
 		LastRoundZombies_Collection.Clear();
-
-
+		LastLastRoundZombies_Collection.Clear();
 
 		int Successfully_Spawned = 0;
 
@@ -99,17 +102,25 @@ public partial class ZeCore : Game
 			Random rand = new Random();
 			
 			var target = Client.All[rand.Next( Client.All.Count )];
-			if ( target.Pawn.Tags.Has( "zombie" ) || LastRoundMZM.Contains( target.ToString() ) )
-			{
-				continue; // avoid from random choosing same zombie, or choosing last round MotherZombie
-			}
+
+			// TODO: Convert to SteamId
+			//if ( target.Pawn.Tags.Has( "zombie" ) || LastRoundMZM.Contains( target.ToString() ) )
+			//{
+			//	continue; // avoid from random choosing same zombie, or choosing last round MotherZombie
+			//}
+			//if ( LastLastRoundMZM.Contains( target.ToString() ) && rand.Next( 2 ) == 1 )
+			//{
+			//	// 50% chance to get immunity
+			//	continue; // give immunity to LastLastRound spawned mother zombie
+			//}
+			
 
 			target.Pawn.Tags.Add( "zombie" );
-			Log.Info( target.ToString() );
 
-			Log.Info( LastRoundMZM );
-			
+
+
 			LastRoundZombies_Collection.Add( target.ToString() );
+
 			target.Pawn.Inventory.DeleteContents();
 			await GameTask.DelaySeconds( 0.0001f );
 
@@ -135,12 +146,16 @@ public partial class ZeCore : Game
 
 			Successfully_Spawned++;
 		}
+		LastLastRoundZombies_Collection = LastRoundMZM;
 	}
 
 	public async Task RoundOver()
 	{
-		await GameTask.DelaySeconds( 5.0f );
+		await GameTask.DelaySeconds( 7.0f );
 		RoundCounter = 0;
+
+		Humans = 0;
+		Zombies = 0;
 
 		foreach (Client client in Client.All)
 		{
@@ -158,16 +173,19 @@ public partial class ZeCore : Game
 			
 
 
-			Humans = 0;
-			Zombies = 0;
+			//Humans = 0;
+			//Zombies = 0;
 			player.Inventory.DeleteContents();
 
 			await GameTask.DelaySeconds( 0.0001f );
 			player.Respawn();
 
+			
+
 
 		}
-		CounterToMotherZombie = 25;
+
+		CounterToMotherZombie = 20;
 		await MotherZombie();
 	}
 }

@@ -68,7 +68,7 @@ partial class ZePlayer : Player
 		Inventory.Add( new Knife(), true );
 		Health = 5000;
 		Sound.FromEntity( "zm_infect", this );
-		this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
+		this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
 	}
 
 
@@ -136,7 +136,8 @@ partial class ZePlayer : Player
 			Inventory.Add( new Knife(), true );
 			DebugOverlay.ScreenText( 9, "You're zombie!", 5.0f );
 			this.Health = 5000;
-			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
+			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
+
 		} else
 		{
 			DebugOverlay.ScreenText( 10, "You're human!", 5.0f );
@@ -147,7 +148,7 @@ partial class ZePlayer : Player
 			Inventory.Add( new SMG() );
 
 			// basic citizen color
-			this.RenderColor = new Color32( 255, 255, 255, 255 );
+			this.RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
 		}
 
 
