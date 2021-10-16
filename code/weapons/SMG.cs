@@ -16,6 +16,7 @@ partial class SMG : Weapon
 		SetModel( "weapons/rust_smg/rust_smg.vmdl" );
 	}
 
+	
 	public override void AttackPrimary()
 	{
 		TimeSincePrimaryAttack = 0;
@@ -27,12 +28,13 @@ partial class SMG : Weapon
 		// Tell the clients to play the shoot effects
 		//
 		ShootEffects();
-		PlaySound( "rust_smg.shoot" );
+		//PlaySound( "rust_smg.shoot" );
+		PlaySound( "pistolsound" );
 
 		//
 		// Shoot the bullets
 		//
-		ShootBullet( 0.1f, 1.5f, 10.0f, 3.0f );
+		ShootBullet( 0.1f, 1.5f, 1.0f, 3.0f );
 	}
 
 	public override void AttackSecondary()
