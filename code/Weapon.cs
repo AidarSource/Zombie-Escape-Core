@@ -1,11 +1,20 @@
 ﻿using Sandbox;
 using Sandbox.UI;
+using System;
 
 public partial class Weapon : BaseWeapon, IUse
 {
+	public virtual AmmoType AmmoType => AmmoType.Pistol;
+	[Net, Predicted]
+	public int AmmoClip { get; set; }
 	public virtual float ReloadTime => 3.0f;
+	public virtual int ClipSize => 12;
 	private float ZombieKnockback = 300.0f;
 	private float ZombieOnAirKnockback = 5.0f;
+	public virtual int Bucket => 1;
+	public virtual int BucketWeight => 10;
+	public virtual int AmmoMax => -1;
+	public int AmmoCount { get; set; } = 10;
 
 	public PickupTrigger PickupTrigger { get; protected set; }
 
@@ -17,6 +26,14 @@ public partial class Weapon : BaseWeapon, IUse
 
 	[Net, Predicted]
 	public TimeSince TimeSinceDeployed { get; set; }
+
+	public int AvailableAmmo()
+	{
+		var owner = Owner as ZePlayer;
+		if ( owner == null ) return 0;
+		//return owner.AmmoCount( AmmoType );
+		return AmmoCount;
+	}
 
 	public override void Spawn()
 	{
@@ -31,6 +48,8 @@ public partial class Weapon : BaseWeapon, IUse
 		};
 
 		PickupTrigger.PhysicsBody.EnableAutoSleeping = false;
+
+		AmmoCount = AmmoMax;
 	}
 
 	public override void ActiveStart( Entity ent )
@@ -38,13 +57,28 @@ public partial class Weapon : BaseWeapon, IUse
 		base.ActiveStart( ent );
 
 		TimeSinceDeployed = 0;
+
+		IsReloading = false;
 	}
 
 	public override void Reload()
 	{
 		if ( IsReloading )
 			return;
+
+		if ( AmmoClip >= ClipSize )
+			return;
+
 		TimeSinceReload = 0;
+
+		if ( Owner is ZePlayer player )
+		{
+			//if ( player.AmmoCount( AmmoType ) <= 0 )
+			//	return;
+			if ( AmmoCount <= 0 && AmmoMax != -1 )
+				return;
+		}
+
 		IsReloading = true;
 
 		(Owner as AnimEntity)?.SetAnimBool( "b_reload", true );
@@ -71,12 +105,48 @@ public partial class Weapon : BaseWeapon, IUse
 	public virtual void OnReloadFinish()
 	{
 		IsReloading = false;
+
+		if(AmmoMax == -1)
+		{
+			AmmoClip = ClipSize;
+		}
+		else
+		{
+			var amount = Math.Min( AmmoCount, ClipSize - AmmoClip );
+			AmmoCount -= amount;
+
+			AmmoClip += amount;
+		}
+
+		//if( Owner is ZePlayer player )
+		//{
+		//	var ammo = player.TakeAmmo( AmmoType, ClipSize - AmmoClip );
+		//	if ( ammo == 0 )
+		//		return;
+
+		//	AmmoClip += ammo;
+		//}
 	}
 
 	[ClientRpc]
 	public virtual void StartReloadEffects()
 	{
 		ViewModelEntity?.SetAnimBool( "reload", true );
+	}
+
+	public bool TakeAmmo( int amount )
+	{
+		if ( AmmoClip < amount )
+			return false;
+
+		AmmoClip -= amount;
+		return true;
+	}
+
+	[ClientRpc]
+	public virtual void DryFire()
+	{
+		// CLICK
 	}
 
 	public override void CreateViewModel()
@@ -111,14 +181,18 @@ public partial class Weapon : BaseWeapon, IUse
 
 	public virtual bool IsUsable( Entity user )
 	{
-		if ( Owner != null ) return false;
+		//if ( Owner != null ) return false;
 
-		if (user.Inventory is Inventory inventory )
-		{
-			return inventory.CanAdd( this );
-		}
+		//if (user.Inventory is Inventory inventory )
+		//{
+		//	return inventory.CanAdd( this );
+		//}
 
-		return true;
+		//return true;
+
+		if ( AmmoClip > 0 ) return true;
+		if ( AmmoMax == -1 ) return true;
+		return AvailableAmmo() > 0;
 	}
 
 	public void Remove()

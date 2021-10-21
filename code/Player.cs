@@ -8,6 +8,8 @@ partial class ZePlayer : Player
 	private TimeSince timeSinceDropped;
 	private TimeSince timeSinceJumpReleased;
 
+	public bool SupressPickupNotices { get; private set; }
+
 	private int counter = 20;
 
 	private TimeSince LocalTimeSince;
@@ -146,11 +148,17 @@ partial class ZePlayer : Player
 
 			Inventory.Add( new Pistol(), true );
 			Inventory.Add( new SMG() );
+			Inventory.Add( new AK47() );
 
 			// basic citizen color
 			this.RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
 		}
 
+		SupressPickupNotices = true;
+
+		GiveAmmo( AmmoType.Pistol, 100 );
+
+		SupressPickupNotices = false;
 
 		base.Respawn();
 	}
@@ -183,14 +191,14 @@ partial class ZePlayer : Player
 				((ZeCore)ZeCore.Current).RoundCounter++;
 				if ( ((ZeCore)ZeCore.Current).Humans == 0 )
 				{
-					((ZeCore)ZeCore.Current).RoundResultText = "Zombies win the round";
+					((ZeCore)ZeCore.Current).RoundResultText = "ZOMBIES WIN THE ROUND";
 					((ZeCore)ZeCore.Current).ZombieWinRounds++;
 					_ = ((ZeCore)ZeCore.Current).RoundOver();
 					//_ = ((ZeCore)ZeCore.Current).MotherZombie();
 				}
 				else
 				{
-					((ZeCore)ZeCore.Current).RoundResultText = "Humans win the round";
+					((ZeCore)ZeCore.Current).RoundResultText = "HUMANS WIN THE ROUND";
 					((ZeCore)ZeCore.Current).HumanWinRounds++;
 				}
 			}
