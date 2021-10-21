@@ -17,6 +17,7 @@ public partial class ZeCore : Game
 	public bool ItsFirstRound = true;
 	[Net] public bool OnlyOnce { get; set; } = false;
 	[Net] public bool IsZombie { get; set; } = false;
+	[Net] public bool IgnoreImmunity { get; set; } = false;
 	// ...
 	// Team status Variables
 	// ...
@@ -94,26 +95,44 @@ public partial class ZeCore : Game
 		LastLastRoundZombies_Collection.Clear();
 
 		int Successfully_Spawned = 0;
+		int CurrentlyPlayingPlayer_WithImmunity = 0;
+
+		foreach( Client client in Client.All )
+		{
+			if ( client.Pawn is not ZePlayer player )
+			{
+				continue;
+			}
+			if( LastRoundMZM.Contains(client.ToString()) || LastLastRoundMZM.Contains( client.ToString() ) )
+			{
+				CurrentlyPlayingPlayer_WithImmunity++;
+			}
+		}
+
+		if(CurrentlyPlayingPlayer_WithImmunity == Client.All.Count)
+		{
+			IgnoreImmunity = true;
+		}
+
 
 		while ( Successfully_Spawned <= NumberZmToSpawn )
 		{
-			
 
 			Random rand = new Random();
 			
 			var target = Client.All[rand.Next( Client.All.Count )];
 
 			// TODO: Convert to SteamId
-			//if ( target.Pawn.Tags.Has( "zombie" ) || LastRoundMZM.Contains( target.ToString() ) )
-			//{
-			//	continue; // avoid from random choosing same zombie, or choosing last round MotherZombie
-			//}
-			//if ( LastLastRoundMZM.Contains( target.ToString() ) && rand.Next( 2 ) == 1 )
-			//{
-			//	// 50% chance to get immunity
-			//	continue; // give immunity to LastLastRound spawned mother zombie
-			//}
-			
+			if ( (target.Pawn.Tags.Has( "zombie" ) || LastRoundMZM.Contains( target.ToString() )) && !IgnoreImmunity )
+			{
+				continue; // avoid from random choosing same zombie, or choosing last round MotherZombie
+			}
+			if ( LastLastRoundMZM.Contains( target.ToString() ) && rand.Next( 2 ) == 1 && !IgnoreImmunity )
+			{
+				// 50% chance to get immunity
+				continue; // give immunity to LastLastRound spawned mother zombie
+			}
+
 
 			target.Pawn.Tags.Add( "zombie" );
 
@@ -172,9 +191,6 @@ public partial class ZeCore : Game
 			RoundStatusCheck = false;
 			
 
-
-			//Humans = 0;
-			//Zombies = 0;
 			player.Inventory.DeleteContents();
 
 			await GameTask.DelaySeconds( 0.0001f );
