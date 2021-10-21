@@ -7,13 +7,20 @@ partial class SMG : Weapon
 
 	public override float PrimaryRate => 15.0f;
 	public override float SecondaryRate => 1.0f;
-	public override float ReloadTime => 5.0f;
+	
+	public override int ClipSize => 30;
+	public override float ReloadTime => 4.0f;
+	public override int Bucket => 1;
+	//public override int BucketWeight => 150;
+	//public override AmmoType AmmoType => AmmoType.SMG;
+	//public override int AmmoMax => -1;
 
 	public override void Spawn()
 	{
 		base.Spawn();
 
 		SetModel( "weapons/rust_smg/rust_smg.vmdl" );
+		AmmoClip = 30;
 	}
 
 	
@@ -21,6 +28,12 @@ partial class SMG : Weapon
 	{
 		TimeSincePrimaryAttack = 0;
 		TimeSinceSecondaryAttack = 0;
+
+		if ( !TakeAmmo( 1 ) )
+		{
+			DryFire();
+			return;
+		}
 
 		(Owner as AnimEntity)?.SetAnimBool( "b_attack", true );
 
@@ -58,6 +71,35 @@ partial class SMG : Weapon
 		ViewModelEntity?.SetAnimBool( "fire", true );
 		CrosshairPanel?.CreateEvent( "fire" );
 	}
+
+	//public override void OnReloadFinish()
+	//{
+	//	IsReloading = false;
+
+	//	TimeSincePrimaryAttack = 0;
+	//	TimeSinceSecondaryAttack = 0;
+
+	//	if ( AmmoClip >= ClipSize )
+	//		return;
+
+	//	if ( Owner is ZePlayer player )
+	//	{
+	//		var ammo = player.TakeAmmo( AmmoType, 1 );
+	//		if ( ammo == 0 )
+	//			return;
+
+	//		AmmoClip += ammo;
+
+	//		if ( AmmoClip < ClipSize )
+	//		{
+	//			Reload();
+	//		}
+	//		else
+	//		{
+	//			//FinishReload();
+	//		}
+	//	}
+	//}
 
 	public override void SimulateAnimator( PawnAnimator anim )
 	{

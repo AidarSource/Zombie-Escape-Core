@@ -1,13 +1,14 @@
 ﻿using Sandbox;
 
-[Library( "weapon_pistol", Title = "Pistol", Spawnable = true )] 
-
+[Library( "weapon_pistol", Title = "Pistol", Spawnable = true )]
 partial class Pistol : Weapon
 {
 	public override string ViewModelPath => "weapons/rust_pistol/v_rust_pistol.vmdl";
 
 	public override float PrimaryRate => 15.0f;
 	public override float SecondaryRate => 1.0f;
+	public override float ReloadTime => 3.0f;
+	public override int Bucket => 1;
 
 	public TimeSince TimeSinceDischarge { get; set; }
 
@@ -16,6 +17,7 @@ partial class Pistol : Weapon
 		base.Spawn();
 
 		SetModel( "weapons/rust_pistol/rust_pistol.vmdl" );
+		AmmoClip = 12;
 	}
 
 	//public override bool CanPrimaryAttack()
@@ -28,6 +30,12 @@ partial class Pistol : Weapon
 		TimeSincePrimaryAttack = 0;
 		TimeSinceSecondaryAttack = 0;
 		(Owner as AnimEntity)?.SetAnimBool( "b_attack", true );
+
+		if( !TakeAmmo( 1 ) )
+		{
+			DryFire();
+			return;
+		}
 
 		ShootEffects();
 		PlaySound( "rust_pistol.shoot" );
