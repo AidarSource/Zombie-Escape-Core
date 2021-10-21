@@ -4,7 +4,7 @@ using System.Linq;
 
 partial class Inventory : BaseInventory
 {
-	public Inventory(Player player) : base( player )
+	public Inventory(ZePlayer player) : base( player )
 	{
 
 	}
@@ -20,16 +20,48 @@ partial class Inventory : BaseInventory
 		return !IsCarryingType( entity.GetType() );
 	}
 
-	public override bool Add( Entity entity, bool makeActive = false )
-	{
-		if ( !entity.IsValid() )
-			return false;
+	//public override bool Add( Entity entity, bool makeActive = false )
+	//{
+	//	var player = Owner as ZePlayer;
+	//	var weapon = entity as ZePlayer;
+	//	var notices = !player.SupressPickupNotices;
+	//	//
+	//	// We don't want to pick up the same weapon twice
+	//	// But we'll take the ammo from it Winky Face
+	//	//
+	//	if ( weapon != null && IsCarryingType( entity.GetType() ) )
+	//	{
+	//		var ammo = weapon.AmmoClip;
+	//		var ammoType = weapon.AmmoType;
 
-		if ( IsCarryingType( entity.GetType() ) )
-			return false;
+	//		if ( ammo > 0 )
+	//		{
+	//			player.GiveAmmo( ammoType, ammo );
 
-		return base.Add( entity, makeActive );
-	}
+	//			if ( notices )
+	//			{
+	//				//Sound.FromWorld( "dm.pickup_ammo", ent.Position );
+	//				//PickupFeed.OnPickup( To.Single( player ), $"+{ammo} {ammoType}" );
+	//			}
+	//		}
+
+	//		//ItemRespawn.Taken( entity );
+
+	//		// Despawn it
+	//		entity.Delete();
+	//		return false;
+	//	}
+
+	//	if ( weapon != null && notices )
+	//	{
+	//		Sound.FromWorld( "dm.pickup_weapon", entity.Position );
+	//		//PickupFeed.OnPickup( To.Single( player ), $"{entity.ClassInfo.Title}" );
+	//	}
+
+
+	//	//ItemRespawn.Taken( entity );
+	//	return base.Add( entity, makeActive );
+	//}
 
 	public bool IsCarryingType( Type t )
 	{
