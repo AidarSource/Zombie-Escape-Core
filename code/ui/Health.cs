@@ -15,6 +15,6 @@ public class Health : Panel
 		var player = Local.Pawn;
 		if ( player == null ) return;
 
-		Label.Text = "Health: " + $"{player.Health.CeilToInt()}";
+		Label.Text = "+ " + $"{player.Health.CeilToInt()}";
 	}
 }
