@@ -8,6 +8,10 @@ public class ViewModel : BaseViewModel
 	protected float BobCycleTime => 7;
 	protected Vector3 BobDirection => new Vector3( 0.0f, 1.0f, 0.5f );
 
+	float lerpX = 0;
+	float lerpY = 0;
+	float lerpZ = 0;
+
 	private Vector3 swingOffset;
 	private float lastPitch;
 	private float lastYaw;
@@ -34,6 +38,26 @@ public class ViewModel : BaseViewModel
 		Rotation = camSetup.Rotation;
 
 		camSetup.ViewModel.FieldOfView = FieldOfView;
+
+		if ( Owner.Inventory.Active is Weapon )
+		{
+			Weapon wep = Owner.Inventory.Active as Weapon;
+			if ( wep.IsAiming )
+			{
+				lerpX = MathX.LerpTo( lerpX, wep.AimPosition.x, Time.Delta * 8 );
+				lerpY = MathX.LerpTo( lerpY, wep.AimPosition.y, Time.Delta * 8 );
+				lerpZ = MathX.LerpTo( lerpZ, wep.AimPosition.z, Time.Delta * 8 );
+			}
+			else
+			{
+				lerpX = MathX.LerpTo( lerpX, 0, Time.Delta * 8 );
+				lerpY = MathX.LerpTo( lerpY, 0, Time.Delta * 8 );
+				lerpZ = MathX.LerpTo( lerpZ, 0, Time.Delta * 8 );
+			}
+			Position += Rotation.Left * lerpX;
+			Position += Rotation.Up * lerpY;
+			Position += Rotation.Forward * lerpZ;
+		}
 
 		var playerVelocity = Local.Pawn.Velocity;
 

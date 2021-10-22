@@ -15,7 +15,8 @@ public partial class Weapon : BaseWeapon, IUse
 	public virtual int BucketWeight => 10;
 	public virtual int AmmoMax => -1;
 	public int AmmoCount { get; set; } = 10;
-
+	public bool IsAiming { get; set; }
+	public virtual Vector3 AimPosition => new( 10, 10, 10 );
 	public PickupTrigger PickupTrigger { get; protected set; }
 
 	[Net, Predicted]
@@ -84,6 +85,11 @@ public partial class Weapon : BaseWeapon, IUse
 		(Owner as AnimEntity)?.SetAnimBool( "b_reload", true );
 
 		StartReloadEffects();
+	}
+
+	public override void AttackSecondary()
+	{
+		IsAiming = !IsAiming;
 	}
 
 	public override void Simulate( Client owner )
