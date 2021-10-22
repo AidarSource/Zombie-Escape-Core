@@ -87,10 +87,10 @@ public partial class Weapon : BaseWeapon, IUse
 		StartReloadEffects();
 	}
 
-	public override void AttackSecondary()
-	{
-		IsAiming = !IsAiming;
-	}
+	//public override void AttackSecondary()
+	//{
+	//	IsAiming = !IsAiming;
+	//}
 
 	public override void Simulate( Client owner )
 	{

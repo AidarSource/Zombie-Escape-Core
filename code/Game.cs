@@ -11,7 +11,7 @@ public partial class ZeCore : Game
 	// ...
 	// Mother Zombie Variables
 	// ...
-	[Net] public int CounterToMotherZombie { get; set; } = 20;
+	[Net] public int CounterToMotherZombie { get; set; } = 99999;
 	[Net] public float MotherZombie_SpawnRate { get; set; } = 0.1f;
 	public byte CounterToClear_LastLastMZM_List = 0;
 	public bool ItsFirstRound = true;

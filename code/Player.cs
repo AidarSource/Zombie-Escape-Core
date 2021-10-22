@@ -150,9 +150,9 @@ partial class ZePlayer : Player
 
 			((ZeCore)ZeCore.Current).Humans++;
 
-			Inventory.Add( new Pistol(), true );
+			Inventory.Add( new PM(), true );
 			Inventory.Add( new SMG() );
-			Inventory.Add( new AK47() );
+			Inventory.Add( new AK74() );
 
 			// basic citizen color
 			RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
