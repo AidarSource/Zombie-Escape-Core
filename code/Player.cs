@@ -59,10 +59,13 @@ partial class ZePlayer : Player
 	{
 		//IsZombie = true;
 		Tags.Add( "zombie" );
-		((ZeCore)ZeCore.Current).Humans--;
-		((ZeCore)ZeCore.Current).Zombies++;
+		var currentGame = Game.Current as ZeCore;
 
-		this.Inventory.DeleteContents();
+		currentGame.Humans--;
+		currentGame.Zombies++;
+
+		if(IsServer)
+			Inventory.DeleteContents();
 
 		await GameTask.DelaySeconds( 0.01f );
 
@@ -70,7 +73,7 @@ partial class ZePlayer : Player
 		Inventory.Add( new Knife(), true );
 		Health = 5000;
 		Sound.FromEntity( "zm_infect", this );
-		this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
+		RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
 	}
 
 
@@ -78,19 +81,20 @@ partial class ZePlayer : Player
 	{
 		MainCamera = new FirstPersonCamera();
 		LastCamera = MainCamera;
+		var currentGame = Game.Current as ZeCore;
 
-		if( !((ZeCore)ZeCore.Current).OnlyOnce )
+		if ( !currentGame.OnlyOnce )
 		{
-			((ZeCore)ZeCore.Current).OnlyOnce = true;
+			currentGame.OnlyOnce = true;
 			//MotherZombie();
-			_ = ((ZeCore)ZeCore.Current).MotherZombie();
+			_ = currentGame.MotherZombie();
 		}
 
-		if( ((ZeCore)ZeCore.Current).CounterToMotherZombie == 0 )
+		if( currentGame.CounterToMotherZombie == 0 )
 		{
 			//IsZombie = true;
 			Tags.Add( "zombie" );
-			this.Health = 5000;
+			Health = 5000;
 		}
 
 
@@ -137,8 +141,8 @@ partial class ZePlayer : Player
 			((ZeCore)ZeCore.Current).Zombies++;
 			Inventory.Add( new Knife(), true );
 			DebugOverlay.ScreenText( 9, "You're zombie!", 5.0f );
-			this.Health = 5000;
-			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
+			Health = 5000;
+			RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
 
 		} else
 		{
@@ -151,7 +155,7 @@ partial class ZePlayer : Player
 			Inventory.Add( new AK47() );
 
 			// basic citizen color
-			this.RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
+			RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
 		}
 
 		SupressPickupNotices = true;
@@ -177,29 +181,27 @@ partial class ZePlayer : Player
 		if ( LifeState != LifeState.Alive )
 			return;
 
+		var currentGame = Game.Current as ZeCore;
 
-		DebugOverlay.ScreenText( 3, "Humans: " + ((ZeCore)ZeCore.Current).Humans.ToString() );
-		DebugOverlay.ScreenText( 4, "Zombies: " + ((ZeCore)ZeCore.Current).Zombies.ToString() );
+		DebugOverlay.ScreenText( 3, "Humans: " + currentGame.Humans.ToString() );
+		DebugOverlay.ScreenText( 4, "Zombies: " + currentGame.Zombies.ToString() );	
 
-
-		
-
-		if ( ((ZeCore)ZeCore.Current).RoundStatusCheck )
+		if ( currentGame.RoundStatusCheck )
 		{
-			if ( ((ZeCore)ZeCore.Current).RoundCounter == 0 && (((ZeCore)ZeCore.Current).Humans == 0 || ((ZeCore)ZeCore.Current).Zombies == 0) )
+			if ( currentGame.RoundCounter == 0 && currentGame.Humans == 0 || currentGame.Zombies == 0) 
 			{
-				((ZeCore)ZeCore.Current).RoundCounter++;
-				if ( ((ZeCore)ZeCore.Current).Humans == 0 )
+				currentGame.RoundCounter++;
+				if ( currentGame.Humans == 0 )
 				{
-					((ZeCore)ZeCore.Current).RoundResultText = "ZOMBIES WIN THE ROUND";
-					((ZeCore)ZeCore.Current).ZombieWinRounds++;
-					_ = ((ZeCore)ZeCore.Current).RoundOver();
-					//_ = ((ZeCore)ZeCore.Current).MotherZombie();
+					currentGame.RoundResultText = "ZOMBIES WIN THE ROUND";
+					currentGame.ZombieWinRounds++;
+					_ = currentGame.RoundOver();
+					//_ = currentGame.MotherZombie();
 				}
 				else
 				{
-					((ZeCore)ZeCore.Current).RoundResultText = "HUMANS WIN THE ROUND";
-					((ZeCore)ZeCore.Current).HumanWinRounds++;
+					currentGame.RoundResultText = "HUMANS WIN THE ROUND";
+					currentGame.HumanWinRounds++;
 				}
 			}
 		}

@@ -86,10 +86,10 @@ public partial class ZeCore : Game
 		
 		int NumberZmToSpawn = (int)Math.Round( Client.All.Count * MotherZombie_SpawnRate );
 
-		List<string> LastRoundMZM = new List<string>(LastRoundZombies_Collection);
+		List<string> LastRoundMZM = new(LastRoundZombies_Collection);
 
 
-		List<string> LastLastRoundMZM = new List<string>(LastLastRoundZombies_Collection);
+		List<string> LastLastRoundMZM = new(LastLastRoundZombies_Collection);
 
 		LastRoundZombies_Collection.Clear();
 		LastLastRoundZombies_Collection.Clear();
@@ -140,10 +140,10 @@ public partial class ZeCore : Game
 
 			LastRoundZombies_Collection.Add( target.ToString() );
 
-			target.Pawn.Inventory.DeleteContents();
+			if ( IsServer )
+				target.Pawn.Inventory.DeleteContents();
+
 			await GameTask.DelaySeconds( 0.0001f );
-
-
 
 			foreach ( Client client in Client.All )
 			{
@@ -190,8 +190,8 @@ public partial class ZeCore : Game
 
 			RoundStatusCheck = false;
 			
-
-			player.Inventory.DeleteContents();
+			if(IsServer)
+				player.Inventory.DeleteContents();
 
 			await GameTask.DelaySeconds( 0.0001f );
 			player.Respawn();

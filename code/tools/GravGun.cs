@@ -237,8 +237,7 @@ public partial class GravGun : Carriable
 
 		HeldEntity = entity;
 
-		var client = GetClientOwner();
-		client?.Pvs.Add( HeldEntity );
+		Client?.Pvs.Add( HeldEntity );
 	}
 
 	private void GrabEnd()
@@ -255,8 +254,7 @@ public partial class GravGun : Carriable
 
 		if ( HeldEntity.IsValid() )
 		{
-			var client = GetClientOwner();
-			client?.Pvs.Remove( HeldEntity );
+			Client?.Pvs.Remove( HeldEntity );
 		}
 
 		HeldBody = null;

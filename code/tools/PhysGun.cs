@@ -198,10 +198,9 @@ public partial class PhysGun : Carriable
 		GrabbedPos = body.Transform.PointToLocal( tr.EndPos );
 		GrabbedBone = tr.Entity.PhysicsGroup.GetBodyIndex( body );
 
-		var client = GetClientOwner();
-		if ( client != null )
+		if ( Client != null )
 		{
-			client.Pvs.Add( GrabbedEntity );
+			Client.Pvs.Add( GrabbedEntity );
 		}
 	}
 
