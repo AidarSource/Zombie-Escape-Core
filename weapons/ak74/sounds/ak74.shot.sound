@@ -7,7 +7,7 @@
 			"weapons/ak74/sounds/ak74_shot_0.vsnd",
 		]
 		UI = false
-		Volume = 1.0
+		Volume = 0.3
 		VolumeRandom = 0.0
 		Pitch = 1.0
 		PitchRandom = 0.0

@@ -7,10 +7,10 @@
 			"weapons/pm/sounds/pm_shoot.vsnd",
 		]
 		UI = false
-		Volume = 1.0
+		Volume = 0.4
 		VolumeRandom = 0.0
 		Pitch = 1.0
 		PitchRandom = 0.0
-		DistanceMax = 1500.0
+		DistanceMax = 1000.0
 	}
 }
