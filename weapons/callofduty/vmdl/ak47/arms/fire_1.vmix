@@ -1,0 +1,78 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	dsp_presets = [  ]
+	dsp_preview = null
+	Graphs = 
+	[
+		{
+			m_nGraphOutputChannels = -1
+			Name = "main"
+			m_nNodesCreated = [  ]
+			m_EditorState = 
+			{
+				XAxis = 
+				{
+					pos = 0.0
+					min = 0.0
+					max = 1.0
+					scale = 1.0
+				}
+				YAxis = 
+				{
+					pos = 0.0
+					min = 0.0
+					max = 1.0
+					scale = 1.0
+				}
+			}
+		},
+		{
+			m_nGraphOutputChannels = -1
+			Name = "fire"
+			m_nNodesCreated = 
+			[
+				0, 0, 0, 0,
+				0, 0, 0, 1,
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 1, 1, 0,
+				1, 0, 0, 0,
+				0, 0,
+			]
+			m_EditorState = 
+			{
+				XAxis = 
+				{
+					pos = 0.0
+					min = -100000.0
+					max = 98877.0
+					scale = 1.0
+				}
+				YAxis = 
+				{
+					pos = 0.0
+					min = -100000.0
+					max = 99427.0
+					scale = 1.0
+				}
+			}
+			m_EditorPreview = 
+			{
+				volume = 1.0
+				mix = 1.0
+				voiceList = 
+				[
+					{
+						sound = "callofduty/vmdl/ak47/arms/sounds/fire.vsnd"
+						track = ""
+						isEvent = false
+					},
+				]
+			}
+		},
+	]
+	Editor = 
+	{
+		SelectedGraph = 1
+	}
+}
