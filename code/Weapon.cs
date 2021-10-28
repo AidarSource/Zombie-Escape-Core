@@ -15,8 +15,6 @@ public partial class Weapon : BaseWeapon, IUse
 	public virtual int BucketWeight => 10;
 	public virtual int AmmoMax => -1;
 	public int AmmoCount { get; set; } = 10;
-	public bool IsAiming { get; set; }
-	public virtual Vector3 AimPosition => new( 10, 10, 10 );
 	public PickupTrigger PickupTrigger { get; protected set; }
 
 	[Net, Predicted]
@@ -27,6 +25,10 @@ public partial class Weapon : BaseWeapon, IUse
 
 	[Net, Predicted]
 	public TimeSince TimeSinceDeployed { get; set; }
+
+	public virtual float bobbing_X { get; set; } = 0.0f;
+	public virtual float bobbing_Y { get; set; } = 1.0f;
+	public virtual float bobbing_Z { get; set; } = 0.5f;
 
 	public int AvailableAmmo()
 	{
@@ -39,6 +41,7 @@ public partial class Weapon : BaseWeapon, IUse
 	public override void Spawn()
 	{
 		base.Spawn();
+
 
 		PickupTrigger = new PickupTrigger
 		{
@@ -89,7 +92,7 @@ public partial class Weapon : BaseWeapon, IUse
 
 	//public override void AttackSecondary()
 	//{
-	//	IsAiming = !IsAiming;
+		
 	//}
 
 	public override void Simulate( Client owner )
@@ -123,15 +126,6 @@ public partial class Weapon : BaseWeapon, IUse
 
 			AmmoClip += amount;
 		}
-
-		//if( Owner is ZePlayer player )
-		//{
-		//	var ammo = player.TakeAmmo( AmmoType, ClipSize - AmmoClip );
-		//	if ( ammo == 0 )
-		//		return;
-
-		//	AmmoClip += ammo;
-		//}
 	}
 
 	[ClientRpc]
@@ -166,7 +160,10 @@ public partial class Weapon : BaseWeapon, IUse
 		{
 			Position = Position,
 			Owner = Owner,
-			EnableViewmodelRendering = true
+			EnableViewmodelRendering = true,
+			xCfg = bobbing_X,
+			yCfg = bobbing_Y,
+			zCfg = bobbing_Z
 		};
 
 		ViewModelEntity.SetModel( ViewModelPath );

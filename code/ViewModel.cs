@@ -1,16 +1,15 @@
 ﻿using Sandbox;
 
-public class ViewModel : BaseViewModel
+public partial class ViewModel : BaseViewModel
 {
 	protected float SwingInfluence => 0.05f;
 	protected float ReturnSpeed => 5.0f;
 	protected float MaxOffsetLength => 10.0f;
 	protected float BobCycleTime => 7;
-	protected Vector3 BobDirection => new Vector3( 0.0f, 1.0f, 0.5f );
-
-	float lerpX = 0;
-	float lerpY = 0;
-	float lerpZ = 0;
+	public float xCfg;
+	public float yCfg;
+	public float zCfg;
+	protected Vector3 BobDirection => new Vector3( xCfg, yCfg, zCfg );
 
 	private Vector3 swingOffset;
 	private float lastPitch;
@@ -38,26 +37,6 @@ public class ViewModel : BaseViewModel
 		Rotation = camSetup.Rotation;
 
 		camSetup.ViewModel.FieldOfView = FieldOfView;
-
-		if ( Owner.Inventory.Active is Weapon )
-		{
-			Weapon wep = Owner.Inventory.Active as Weapon;
-			if ( wep.IsAiming )
-			{
-				lerpX = MathX.LerpTo( lerpX, wep.AimPosition.x, Time.Delta * 8 );
-				lerpY = MathX.LerpTo( lerpY, wep.AimPosition.y, Time.Delta * 8 );
-				lerpZ = MathX.LerpTo( lerpZ, wep.AimPosition.z, Time.Delta * 8 );
-			}
-			else
-			{
-				lerpX = MathX.LerpTo( lerpX, 0, Time.Delta * 8 );
-				lerpY = MathX.LerpTo( lerpY, 0, Time.Delta * 8 );
-				lerpZ = MathX.LerpTo( lerpZ, 0, Time.Delta * 8 );
-			}
-			Position += Rotation.Left * lerpX;
-			Position += Rotation.Up * lerpY;
-			Position += Rotation.Forward * lerpZ;
-		}
 
 		var playerVelocity = Local.Pawn.Velocity;
 
@@ -123,4 +102,22 @@ public class ViewModel : BaseViewModel
 
 		return offset;
 	}
+
+	//public struct WeaponsConfig
+	//{
+	//	private int _x, _y, _z;
+	//	public int x
+	//	{
+	//		get
+	//		{
+	//			return _x;
+	//		}
+	//		set
+	//		{
+	//			_x = value;
+	//			xCfg = value;
+	//		}
+	//	}
+
+	//}
 }
