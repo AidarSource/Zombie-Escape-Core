@@ -34,6 +34,16 @@
 ]
 
 //
+// AK47
+//
+@PointClass base(BaseProperties_Zombie_Escape) = weapon_ak47 : ""
+[
+	enable_shadows(boolean) { group = "Rendering" } : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
+
+	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
+]
+
+//
 // AK74
 //
 @PointClass base(BaseProperties_Zombie_Escape) editormodel( "weapons/ak74/w_ak74.vmdl" ) = dm_rifle : ""
