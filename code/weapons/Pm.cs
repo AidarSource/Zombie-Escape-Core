@@ -1,7 +1,7 @@
 ﻿using Sandbox;
 using System;
 
-[Library( "dm_rifle", Title = "AK74" )]
+[Library( "dm_rifle", Title = "Pistol" )]
 [Hammer.EditorModel( "weapons/ak74/w_ak74.vmdl" )]
 partial class PM : Weapon
 {
@@ -12,9 +12,6 @@ partial class PM : Weapon
 	public override int ClipSize => 12;
 	public override float ReloadTime => 2.0f;
 	public override int Bucket => 3;
-	//public override float Spread => 0.1f;
-	//public override bool CanRicochet => true;
-	public override Vector3 AimPosition => new( 11.4f, 11.5f, -25 );
 
 	public override void Spawn()
 	{
