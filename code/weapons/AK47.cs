@@ -1,30 +1,34 @@
 ﻿using Sandbox;
-using System;
 
-[Library( "ak47", Title = "AK-47" )]
-[Hammer.EditorModel( "models/weapons/ak47/ak47.vmdl" )]
+[Library( "weapon_ak47", Title = "AK47", Spawnable = true )]
 partial class AK47 : Weapon
 {
-	public override string ViewModelPath => "models/weapons/ak47/v_ak47.vmdl";
+	public override string ViewModelPath => "weapons/callofduty/vmdl/ak47/arms/ak47.vmdl";
 
-	public override float PrimaryRate => 9.0f;
+	public override float PrimaryRate => 15.0f;
 	public override float SecondaryRate => 1.0f;
+
 	public override int ClipSize => 30;
-	public override float ReloadTime => 2.0f;
-	public override int Bucket => 2;
+	public override float ReloadTime => 4.0f;
+	public override int Bucket => 1;
+
+	public override float bobbing_X => 0.1f;
+	public override float bobbing_Y => 0.1f;
+	public override float bobbing_Z => 0.1f;
 
 	public override void Spawn()
 	{
 		base.Spawn();
 
-		SetModel( "models/weapons/ak47/ak47.vmdl" );
+		SetModel( "weapons/callofduty/vmdl/ak47/arms/ak47_w.vmdl" );
 		AmmoClip = 30;
 	}
+
 
 	public override void AttackPrimary()
 	{
 		TimeSincePrimaryAttack = 0;
-		TimeSinceSecondaryAttack = .5f;
+		TimeSinceSecondaryAttack = 0;
 
 		if ( !TakeAmmo( 1 ) )
 		{
@@ -32,35 +36,24 @@ partial class AK47 : Weapon
 			return;
 		}
 
-		(Owner as AnimEntity).SetAnimBool( "b_attack", true );
+		(Owner as AnimEntity)?.SetAnimBool( "fire", true );
 
 		//
 		// Tell the clients to play the shoot effects
 		//
 		ShootEffects();
-		PlaySound( "ak47.shoot" );
+		PlaySound( "rust_smg.shoot" );
+		//PlaySound( "pistolsound" );
 
 		//
 		// Shoot the bullets
 		//
-		ShootBullet( 0.02f, 1.5f, 1.0f, 3.0f );
-
+		ShootBullet( 0.1f, 1.5f, 1.0f, 3.0f );
 	}
 
 	public override void AttackSecondary()
 	{
-		//ShootEffects();
-		PlaySound( "rust_boneknife.attack" );
-		MeleeStrike( 10, 1.5f );
-
-		if ( IsLocalPawn )
-		{
-			new Sandbox.ScreenShake.Perlin();
-		}
-
-		(Owner as AnimEntity).SetAnimBool( "b_jump", true );
-		ViewModelEntity?.SetAnimBool( "fire", true );
-		CrosshairPanel?.CreateEvent( "fire" );
+		// Grenade lob
 	}
 
 	[ClientRpc]
@@ -73,7 +66,7 @@ partial class AK47 : Weapon
 
 		if ( Owner == Local.Pawn )
 		{
-			new Sandbox.ScreenShake.Perlin( 0.5f, 4.0f, 1.0f, 0.5f );
+			new Sandbox.ScreenShake.Perlin( 0.5f, 1.0f, 0.4f, 0.7f );
 		}
 
 		ViewModelEntity?.SetAnimBool( "fire", true );
