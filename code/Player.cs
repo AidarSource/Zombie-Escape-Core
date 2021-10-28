@@ -63,7 +63,8 @@ partial class ZePlayer : Player
 		((ZeCore)ZeCore.Current).Zombies++;
 
 		this.Inventory.DeleteContents();
-
+		//if ( IsServer )
+		//	Inventory.DeleteContents();
 		await GameTask.DelaySeconds( 0.01f );
 
 
@@ -149,6 +150,7 @@ partial class ZePlayer : Player
 			Inventory.Add( new PM(), true );
 			Inventory.Add( new SMG() );
 			Inventory.Add( new AK74() );
+			Inventory.Add( new AK47() );
 
 			// basic citizen color
 			this.RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
