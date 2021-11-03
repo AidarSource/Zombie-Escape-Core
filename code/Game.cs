@@ -70,7 +70,6 @@ public partial class ZeCore : Game
 		{
 			await GameTask.DelaySeconds( 1.0f );
 			CounterToMotherZombie--;
-			
 
 			if ( CounterToMotherZombie <= 0 )
 			{
@@ -139,8 +138,11 @@ public partial class ZeCore : Game
 
 
 			LastRoundZombies_Collection.Add( target.ToString() );
-
-			target.Pawn.Inventory.DeleteContents();
+			if( IsServer)
+			{
+				target.Pawn.Inventory.DeleteContents();
+			}
+				
 			await GameTask.DelaySeconds( 0.0001f );
 
 
@@ -176,7 +178,7 @@ public partial class ZeCore : Game
 		Humans = 0;
 		Zombies = 0;
 
-		foreach (Client client in Client.All)
+		foreach ( Client client in Client.All )
 		{
 			if ( client.Pawn is not ZePlayer player )
 			{
@@ -189,9 +191,11 @@ public partial class ZeCore : Game
 			}
 
 			RoundStatusCheck = false;
-			
 
-			player.Inventory.DeleteContents();
+			if ( IsServer )
+			{
+				player.Inventory.DeleteContents();
+			}
 
 			await GameTask.DelaySeconds( 0.0001f );
 			player.Respawn();

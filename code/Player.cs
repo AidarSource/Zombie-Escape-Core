@@ -62,9 +62,10 @@ partial class ZePlayer : Player
 		((ZeCore)ZeCore.Current).Humans--;
 		((ZeCore)ZeCore.Current).Zombies++;
 
-		this.Inventory.DeleteContents();
-		//if ( IsServer )
-		//	Inventory.DeleteContents();
+		if ( IsServer )
+		{
+			Inventory.DeleteContents();
+		}
 		await GameTask.DelaySeconds( 0.01f );
 
 
