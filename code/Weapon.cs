@@ -26,9 +26,12 @@ public partial class Weapon : BaseWeapon, IUse
 	[Net, Predicted]
 	public TimeSince TimeSinceDeployed { get; set; }
 
+	// this is shit, need to redo to configs
 	public virtual float bobbing_X { get; set; } = 0.0f;
 	public virtual float bobbing_Y { get; set; } = 1.0f;
 	public virtual float bobbing_Z { get; set; } = 0.5f;
+
+	public virtual float ak47_Waves_Z { get; set; } = 0.8f;
 
 	public int AvailableAmmo()
 	{
@@ -163,7 +166,8 @@ public partial class Weapon : BaseWeapon, IUse
 			EnableViewmodelRendering = true,
 			xCfg = bobbing_X,
 			yCfg = bobbing_Y,
-			zCfg = bobbing_Z
+			zCfg = bobbing_Z,
+			waveZ_ak47 = ak47_Waves_Z
 		};
 
 		ViewModelEntity.SetModel( ViewModelPath );

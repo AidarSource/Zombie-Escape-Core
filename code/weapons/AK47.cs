@@ -16,6 +16,8 @@ partial class AK47 : Weapon
 	public override float bobbing_Y => 0.1f;
 	public override float bobbing_Z => 0.1f;
 
+	public override float ak47_Waves_Z => 0.1f;
+
 	public override void Spawn()
 	{
 		base.Spawn();
