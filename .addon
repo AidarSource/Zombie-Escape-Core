@@ -1,22 +1,14 @@
 {
-	"name": "ZombieEscape",
-	"version": "1.0",
-	"sharedassets": "*.*",
-	"type": "game",
-	"ident": "sandbox.ze",
-	
-	"depends":
-	[
-		"base",
-		"rust"
-	],
-	
-	"gamemodes":
-	[
-		{
-			"name": "Zombie Escape",
-			"title": "Zombie Escape",
-			"description": "ZombieEscape"
-		}
-	]
+  "Title": "Zombie Escape",
+  "Type": "game",
+  "Org": "local",
+  "Ident": "zombie-escape",
+  "Schema": 1,
+  "HasAssets": true,
+  "AssetsPath": "",
+  "ResourcePaths": null,
+  "HasCode": true,
+  "CodePath": "code",
+  "RootNamespace": "Sandbox",
+  "Metadata": {}
 }
