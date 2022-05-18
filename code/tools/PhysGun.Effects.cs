@@ -1,4 +1,5 @@
 ﻿using Sandbox;
+using Sandbox.Component;
 using System.Linq;
 
 public partial class PhysGun
@@ -31,37 +32,43 @@ public partial class PhysGun
 				if ( child is Player )
 					continue;
 
-				child.GlowActive = false;
-				child.GlowState = GlowStates.GlowStateOff;
+				if ( child.Components.TryGet<Glow>( out var childglow ) )
+				{
+					childglow.Active = false;
+				}
 			}
 
-			lastGrabbedEntity.GlowActive = false;
-			lastGrabbedEntity.GlowState = GlowStates.GlowStateOff;
+			if ( lastGrabbedEntity.Components.TryGet<Glow>( out var glow ) )
+			{
+				glow.Active = false;
+			}
+
 			lastGrabbedEntity = null;
 		}
 	}
 
 	protected virtual void UpdateEffects()
 	{
-		var owner = Owner;
+		var owner = Owner as Player;
 
-		if ( owner == null || !BeamActive || !IsActiveChild() )
+		if ( owner == null || !BeamActive || owner.ActiveChild != this )
 		{
 			KillEffects();
 			return;
 		}
 
-		var startPos = owner.EyePos;
-		var dir = owner.EyeRot.Forward;
+		var startPos = owner.EyePosition;
+		var dir = owner.EyeRotation.Forward;
 
 		var tr = Trace.Ray( startPos, startPos + dir * MaxTargetDistance )
 			.UseHitboxes()
-			.Ignore( owner )
+			.Ignore( owner, false )
+			.HitLayer( CollisionLayer.Debris )
 			.Run();
 
 		if ( Beam == null )
 		{
-			Beam = Particles.Create( "particles/physgun_beam.vpcf", tr.EndPos );
+			Beam = Particles.Create( "particles/physgun_beam.vpcf", tr.EndPosition );
 		}
 
 		Beam.SetEntityAttachment( 0, EffectEntity, "muzzle", true );
@@ -91,28 +98,29 @@ public partial class PhysGun
 			if ( GrabbedEntity is ModelEntity modelEnt )
 			{
 				lastGrabbedEntity = modelEnt;
-				modelEnt.GlowState = GlowStates.GlowStateOn;
-				modelEnt.GlowDistanceStart = 0;
-				modelEnt.GlowDistanceEnd = 1000;
-				modelEnt.GlowColor = new Color( 0.1f, 1.0f, 1.0f, 1.0f );
-				modelEnt.GlowActive = true;
+
+				var glow = modelEnt.Components.GetOrCreate<Glow>();
+				glow.Active = true;
+				glow.RangeMin = 0;
+				glow.RangeMax = 1000;
+				glow.Color = new Color( 0.1f, 1.0f, 1.0f, 1.0f );
 
 				foreach ( var child in lastGrabbedEntity.Children.OfType<ModelEntity>() )
 				{
 					if ( child is Player )
 						continue;
 
-					child.GlowState = GlowStates.GlowStateOn;
-					child.GlowDistanceStart = 0;
-					child.GlowDistanceEnd = 1000;
-					child.GlowColor = new Color( 0.1f, 1.0f, 1.0f, 1.0f );
-					child.GlowActive = true;
+					glow = child.Components.GetOrCreate<Glow>();
+					glow.Active = true;
+					glow.RangeMin = 0;
+					glow.RangeMax = 1000;
+					glow.Color = new Color( 0.1f, 1.0f, 1.0f, 1.0f );
 				}
 			}
 		}
 		else
 		{
-			lastBeamPos = tr.EndPos;// Vector3.Lerp( lastBeamPos, tr.EndPos, Time.Delta * 10 );
+			lastBeamPos = tr.EndPosition;// Vector3.Lerp( lastBeamPos, tr.EndPosition, Time.Delta * 10 );
 			Beam.SetPosition( 1, lastBeamPos );
 
 			if ( EndNoHit == null )
