@@ -29,8 +29,8 @@ public partial class ViewModel : BaseViewModel
 
 	public override void PostCameraSetup( ref CameraSetup camSetup )
 	{
-		FieldOfView = camSetup.FieldOfView;
-		camSetup.ViewModel.FieldOfView = FieldOfView;
+		//FieldOfView = camSetup.FieldOfView;
+		camSetup.ViewModel.FieldOfView = camSetup.FieldOfView;
 
 		base.PostCameraSetup( ref camSetup );
 
@@ -48,11 +48,12 @@ public partial class ViewModel : BaseViewModel
 		Position = camSetup.Position;
 		Rotation = camSetup.Rotation;
 
-		camSetup.ViewModel.FieldOfView = FieldOfView;
+		//camSetup.ViewModel.FieldOfView = FieldOfView;
+		camSetup.ViewModel.FieldOfView = camSetup.FieldOfView;
 
 		var playerVelocity = Local.Pawn.Velocity;
 
-		if ( Local.Pawn is Player player )
+		if ( Local.Pawn is ZePlayer player )
 		{
 			var controller = player.GetActiveController();
 			if ( controller != null && controller.HasTag( "noclip" ) )
@@ -61,8 +62,11 @@ public partial class ViewModel : BaseViewModel
 			}
 		}
 
+		
+
 		Sway( ref camSetup );
 
+		ViewmodelBreathe( ref camSetup );
 		ViewmodelBob( ref camSetup );
 		JumpOffset( ref camSetup );
 		MoveOffset( ref camSetup );
@@ -173,7 +177,7 @@ public partial class ViewModel : BaseViewModel
 			return;
 
 		var enabled = controller.Duck.IsActive;
-		var delta = (pawn.EyePosLocal.z / 5) * Time.Delta;
+		var delta = (pawn.EyeLocalPosition.z / 5) * Time.Delta;
 
 		lastCrouchOffset = lastCrouchOffset.LerpTo( enabled ? new Vector3( -4, 0, 0f ) : Vector3.Zero, delta );
 		lastCrouchRot = Rotation.Slerp( lastCrouchRot, enabled ? Rotation.From( 0, 0, -15 ) : Rotation.Identity, delta );
@@ -219,6 +223,34 @@ public partial class ViewModel : BaseViewModel
 
 		Rotation *= lastSwayRot;
 		Position += lastSwayPos;
+	}
+
+	protected static Vector3 lastEnergyBreatheScale;
+	protected static float breatheBobDelta;
+
+	protected virtual void ViewmodelBreathe ( ref CameraSetup camSetup )
+	{
+		var owner = Local.Pawn as ZePlayer;
+
+		//
+		// TODO : CHANGE THIS SHIT FROM HEALTH TO ENERGY
+		//
+		lastEnergyBreatheScale = lastEnergyBreatheScale.LerpTo(owner.Health < 80 ? new Vector3(4, 4, 3) * owner.Health.Remap(100, 0, 0, 1) : IsAimming ? new Vector3(0.3f) : Vector3.One, 1 * Time.Delta);
+
+		var breatheSpeed = 0.6f * lastEnergyBreatheScale.x;
+		var breatheIntensity = 0.25f * lastEnergyBreatheScale.z;
+
+		breatheBobDelta += (Time.Delta) * breatheSpeed;
+
+		var breatheUp = MathF.Cos(breatheBobDelta * 1f) * 1.3f * breatheIntensity;
+		var breatheLeft = MathF.Sin(breatheBobDelta * 0.5f) * 0.8f * breatheIntensity;
+		var breatheForward = MathF.Sin(breatheBobDelta * 0.5f) * 0.5f * breatheIntensity;
+
+		Position += Rotation.Up * breatheUp;
+		Position += Rotation.Left * breatheLeft;
+		Rotation *= Rotation.From(breatheUp * lastEnergyBreatheScale.x, breatheLeft * lastEnergyBreatheScale.y, breatheForward * lastEnergyBreatheScale.z);
+
+		camSetup.Rotation *= Rotation.From(breatheUp * -lastEnergyBreatheScale.z * 1.5f, breatheLeft * -lastEnergyBreatheScale.z * 2, breatheForward * lastEnergyBreatheScale.z * 3);
 	}
 }
 

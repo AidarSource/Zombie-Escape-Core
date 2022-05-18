@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
+
 public partial class ZeCore : Game
 {
 	public List<string> LastRoundZombies_Collection = new();
@@ -11,7 +12,7 @@ public partial class ZeCore : Game
 	// ...
 	// Mother Zombie Variables
 	// ...
-	[Net] public int CounterToMotherZombie { get; set; } = 20;
+	[Net] public int CounterToMotherZombie { get; set; } = 199999;
 	[Net] public float MotherZombie_SpawnRate { get; set; } = 0.1f;
 	public byte CounterToClear_LastLastMZM_List = 0;
 	public bool ItsFirstRound = true;
@@ -52,10 +53,22 @@ public partial class ZeCore : Game
 	public override void ClientJoined( Client cl )
 	{
 		base.ClientJoined( cl );
-		var player = new ZePlayer();
-		player.Respawn();
+		Event.Run( ZeEvent.Player.Connected, cl );
 
+		var player = new ZePlayer();
+		
 		cl.Pawn = player;
+
+		player.SetTeam( Team.Humans );
+		player.Respawn();
+	}
+
+
+	public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
+	{
+		Event.Run( ZeEvent.Player.Disconnected, cl.PlayerId, reason );
+
+		base.ClientDisconnect( cl, reason );
 	}
 
 	protected override void OnDestroy()
@@ -140,7 +153,9 @@ public partial class ZeCore : Game
 			LastRoundZombies_Collection.Add( target.ToString() );
 			if( IsServer)
 			{
-				target.Pawn.Inventory.DeleteContents();
+				var player = target.Pawn as ZePlayer;
+				//target.Pawn.Inventory.DeleteContents();
+				player.Inventory.DeleteContents();
 			}
 				
 			await GameTask.DelaySeconds( 0.0001f );
@@ -168,6 +183,20 @@ public partial class ZeCore : Game
 			Successfully_Spawned++;
 		}
 		LastLastRoundZombies_Collection = LastRoundMZM;
+	}
+
+	[ServerCmd( "ze_switch_teams" )]
+	public static void SwitchTeams()
+	{
+		if ( ConsoleSystem.Caller.Pawn is ZePlayer player )
+		{
+			if ( player.Team == Team.Zombies )
+				player.SetTeam( Team.Humans );
+			else
+				player.SetTeam( Team.Zombies );
+
+			player.Respawn();
+		}
 	}
 
 	public async Task RoundOver()
@@ -200,7 +229,7 @@ public partial class ZeCore : Game
 			await GameTask.DelaySeconds( 0.0001f );
 			player.Respawn();
 
-			
+			Event.Run( ZeEvent.Game.RoundChange );
 
 
 		}

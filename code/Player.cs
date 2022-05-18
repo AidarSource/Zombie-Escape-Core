@@ -16,44 +16,15 @@ partial class ZePlayer : Player
 
 	private bool IsZombie = false;
 
-	[Net, Predicted] public ICamera MainCamera { get; set; }
+	[Net, Predicted] public CameraMode MainCamera { get; set; }
 
-	public ICamera LastCamera { get; set; } 
+	public CameraMode LastCamera { get; set; } 
 
 	// Set Inventory to Player object
 	public ZePlayer()
 	{
 		Inventory = new Inventory( this );
 	}
-
-
-	//public async void MotherZombie()
-	//{
-		
-	//	await ((ZeCore)ZeCore.Current).UI_MotherZombie();
-
-	//	//IsZombie = true;
-	//	Tags.Add( "zombie" );
-
-
-	//	Inventory.DeleteContents();
-
-
-	//	await GameTask.DelaySeconds( 0.01f );
-	//	Respawn();
-	//	Health = 5000;
-
-	//	((ZeCore)ZeCore.Current).Humans--;
-	//	//((ZeCore)ZeCore.Current).Zombies++;
-
-
-
-	//	Sound.FromEntity( "zm_infect", this );
-	//	//this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 );
-	//	((ZeCore)ZeCore.Current).RoundStatusCheck = true;
-	//}
-
-
 
 	public async void Infector()
 	{
@@ -88,22 +59,22 @@ partial class ZePlayer : Player
 			_ = ((ZeCore)ZeCore.Current).MotherZombie();
 		}
 
+		using(Prediction.Off())
+		{
+			Event.Run( ZeEvent.Player.InitialSpawn, Client );
+		}
+
 		if( ((ZeCore)ZeCore.Current).CounterToMotherZombie == 0 )
 		{
 			//IsZombie = true;
 			Tags.Add( "zombie" );
 			this.Health = 5000;
+			SetTeam( Team.Zombies );
+		} else
+		{
+			Tags.Add( "human" );
+			//SwitchTeam();
 		}
-
-
-		//if( !Tags.Has("zombie") )
-		//{
-		//	((ZeCore)ZeCore.Current).Humans++;
-		//} else
-		//{
-		//	((ZeCore)ZeCore.Current).Zombies++;
-		//}
-
 
 		base.Spawn();
 
@@ -121,7 +92,7 @@ partial class ZePlayer : Player
 
 		// Use FirstPersonCamera (you can make your own Camera for 100% control)
 		MainCamera = LastCamera;
-		Camera = MainCamera;
+		CameraMode = MainCamera;
 
 		// Auto bhop = true
 		(Controller as WalkController).AutoJump = true;
@@ -133,26 +104,36 @@ partial class ZePlayer : Player
 		EnableShadowInFirstPerson = true;
 
 
+		using( Prediction.Off() )
+		{
+			Event.Run( ZeEvent.Player.Spawned, this );
+		}
+
 
 		if( Tags.Has("zombie") )
 		{
+			//SetTeam( Team.Zombies );
 			((ZeCore)ZeCore.Current).Zombies++;
-			Inventory.Add( new Knife(), true );
+			Inventory.Add( new Fists(), true );
 			DebugOverlay.ScreenText( 9, "You're zombie!", 5.0f );
 			this.Health = 5000;
 			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
-
+			Log.Info( " team: " + this.Team.GetName() );
 		} else
 		{
+			Log.Info( "(Team Initialization) Success" );
 			DebugOverlay.ScreenText( 10, "You're human!", 5.0f );
+			Log.Info( "Respawn Succesful" );
+			Log.Info( " team: " + this.Team.GetName() );
 
 			((ZeCore)ZeCore.Current).Humans++;
-
 			Inventory.Add( new PM(), true );
+			Inventory.Add( new Shotgun() );
 			Inventory.Add( new SMG() );
 			Inventory.Add( new AK74() );
 			Inventory.Add( new AK47() );
 
+			
 			// basic citizen color
 			this.RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
 		}
@@ -166,10 +147,29 @@ partial class ZePlayer : Player
 		base.Respawn();
 	}
 
+
+	[ServerCmd]
+	public static void SwitchTeam()
+	{
+		if ( ConsoleSystem.Caller.Pawn is ZePlayer player )
+		{
+			var targetTeam = Team.Zombies;
+			var currentTeam = player.Team;
+
+			if ( currentTeam == Team.Zombies )
+				targetTeam = Team.Humans;
+
+			player.SetTeam( targetTeam );
+			player.Respawn();
+
+		}
+	}
+
+
+
 	public override void Simulate( Client cl )
 	{
 		base.Simulate( cl );
-
 
 		// Show current item in Inventory
 		if ( Input.ActiveChild != null )
@@ -185,6 +185,7 @@ partial class ZePlayer : Player
 		DebugOverlay.ScreenText( 4, "Zombies: " + ((ZeCore)ZeCore.Current).Zombies.ToString() );
 
 
+		
 		
 
 		if ( ((ZeCore)ZeCore.Current).RoundStatusCheck )
@@ -214,19 +215,25 @@ partial class ZePlayer : Player
 		// Change Camera perspective with 'C' button
 		if ( Input.Pressed( InputButton.View ) )
 		{
-			if ( Camera is not FirstPersonCamera )
+			if ( CameraMode is not FirstPersonCamera )
 			{
-				Camera = new FirstPersonCamera();
+				CameraMode = new FirstPersonCamera();
 			}
 			else
 			{
-				Camera = new ThirdPersonCamera();
+				CameraMode = new ThirdPersonCamera();
 			}
 		}
 
 		if(Input.Pressed(InputButton.Flashlight))
 		{
-			Sound.FromEntity( "ayayo", this );
+			//Sound.FromEntity( "ayayo", this );
+			//SwitchTeam(cl);
+			//Log.Info( "Team: " + this.Team.GetName() );
+			//ZePlayer.SwitchTeam();
+			Log.Info( cl.GetInt( "team" ) );
+			//cl.SetInt( "team", 2 );
+			cl.SetInt( "team", (int)Team.Humans );
 		}
 
 		if ( Input.Pressed( InputButton.Drop ) )
@@ -234,7 +241,7 @@ partial class ZePlayer : Player
 			var dropped = Inventory.DropActive();
 			if ( dropped != null )
 			{
-				dropped.PhysicsGroup.ApplyImpulse( Velocity + EyeRot.Forward * 500.0f + Vector3.Up * 100.0f, true );
+				dropped.PhysicsGroup.ApplyImpulse( Velocity + EyeRotation.Forward * 500.0f + Vector3.Up * 100.0f, true );
 				dropped.PhysicsGroup.ApplyAngularImpulse( Vector3.Random * 100.0f, true );
 
 				timeSinceDropped = 0;
