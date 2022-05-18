@@ -29,11 +29,17 @@ partial class Pistol : Weapon
 	{
 		TimeSincePrimaryAttack = 0;
 		TimeSinceSecondaryAttack = 0;
-		(Owner as AnimEntity)?.SetAnimBool( "b_attack", true );
+		(Owner as AnimEntity)?.SetAnimParameter( "b_attack", true );
 
 		if( !TakeAmmo( 1 ) )
 		{
 			DryFire();
+
+			if ( AvailableAmmo() > 0 )
+			{
+				Reload();
+			}
+
 			return;
 		}
 

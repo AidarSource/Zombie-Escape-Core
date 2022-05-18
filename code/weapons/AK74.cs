@@ -10,7 +10,7 @@ partial class AK74 : Weapon
 	//public override AmmoType AmmoType => AmmoType.Rifle;
 	public override float PrimaryRate => 10.0f;
 	public override int ClipSize => 30;
-	public override float ReloadTime => 2.0f;
+	public override float ReloadTime => 1.4f;
 	public override int Bucket => 3;
 
 	public override void Spawn()
@@ -29,10 +29,16 @@ partial class AK74 : Weapon
 		if ( !TakeAmmo( 1 ) )
 		{
 			DryFire();
+
+			if(AvailableAmmo() > 0)
+			{
+				Reload();
+			}
+
 			return;
 		}
 
-		(Owner as AnimEntity).SetAnimBool( "b_attack", true );
+		(Owner as AnimEntity).SetAnimParameter( "b_attack", true );
 
 		//
 		// Tell the clients to play the shoot effects
@@ -61,14 +67,14 @@ partial class AK74 : Weapon
 			new Sandbox.ScreenShake.Perlin( 0.5f, 4.0f, 0.5f, 0.5f );
 		}
 
-		ViewModelEntity?.SetAnimBool( "fire", true );
+		ViewModelEntity?.SetAnimParameter( "fire", true );
 		CrosshairPanel?.CreateEvent( "fire" );
 	}
 
 	public override void SimulateAnimator( PawnAnimator anim )
 	{
-		anim.SetParam( "holdtype", 2 ); // TODO this is shit
-		anim.SetParam( "aimat_weight", 1.0f );
+		anim.SetAnimParameter( "holdtype", 2 ); // TODO this is shit
+		anim.SetAnimParameter( "aimat_weight", 1.0f );
 	}
 
 }

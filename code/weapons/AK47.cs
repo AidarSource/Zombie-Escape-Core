@@ -38,7 +38,7 @@ partial class AK47 : Weapon
 			return;
 		}
 
-		(Owner as AnimEntity)?.SetAnimBool( "fire", true );
+		(Owner as AnimEntity)?.SetAnimParameter( "fire", true );
 
 		//
 		// Tell the clients to play the shoot effects
@@ -71,14 +71,14 @@ partial class AK47 : Weapon
 			new Sandbox.ScreenShake.Perlin( 0.5f, 1.0f, 0.4f, 0.7f );
 		}
 
-		ViewModelEntity?.SetAnimBool( "fire", true );
+		ViewModelEntity?.SetAnimParameter( "fire", true );
 		CrosshairPanel?.CreateEvent( "fire" );
 	}
 
 	public override void SimulateAnimator( PawnAnimator anim )
 	{
-		anim.SetParam( "holdtype", 2 ); // TODO this is shit
-		anim.SetParam( "aimat_weight", 1.0f );
+		anim.SetAnimParameter( "holdtype", 2 ); // TODO this is shit
+		anim.SetAnimParameter( "aimat_weight", 1.0f );
 	}
 
 }

@@ -3,13 +3,12 @@
 [Library( "weapon_smg", Title = "SMG", Spawnable = true )]
 partial class SMG : Weapon
 {
-	public override string ViewModelPath => "weapons/rust_smg/v_rust_smg.vmdl";
-
+	public override string ViewModelPath => "weapons/smg/v_rust_smg.vmdl";
 	public override float PrimaryRate => 15.0f;
 	public override float SecondaryRate => 1.0f;
 	
 	public override int ClipSize => 30;
-	public override float ReloadTime => 4.0f;
+	public override float ReloadTime => 2.5f;
 	public override int Bucket => 1;
 	//public override int BucketWeight => 150;
 	//public override AmmoType AmmoType => AmmoType.SMG;
@@ -19,11 +18,19 @@ partial class SMG : Weapon
 	{
 		base.Spawn();
 
-		SetModel( "weapons/rust_smg/rust_smg.vmdl" );
+		SetModel( "weapons/smg/rust_smg.vmdl" );
 		AmmoClip = 30;
 	}
 
-	
+	public override void CreateViewModel()
+	{
+		base.CreateViewModel();
+		ViewModelEntity.SetModel( ViewModelPath );
+		ViewModelEntity.SetAnimGraph( "weapons/smg/v_smg.vanmgrph" );
+		//ViewModelEntity.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
+	}
+
+
 	public override void AttackPrimary()
 	{
 		TimeSincePrimaryAttack = 0;
@@ -32,10 +39,16 @@ partial class SMG : Weapon
 		if ( !TakeAmmo( 1 ) )
 		{
 			DryFire();
+
+			if(AvailableAmmo() > 0)
+			{
+				Reload();
+			}
+
 			return;
 		}
 
-		(Owner as AnimEntity)?.SetAnimBool( "b_attack", true );
+		(Owner as AnimEntity)?.SetAnimParameter( "b_attack", true );
 
 		//
 		// Tell the clients to play the shoot effects
@@ -68,7 +81,7 @@ partial class SMG : Weapon
 			new Sandbox.ScreenShake.Perlin( 0.5f, 4.0f, 1.0f, 0.005f );
 		}
 
-		ViewModelEntity?.SetAnimBool( "fire", true );
+		ViewModelEntity?.SetAnimParameter( "fire", true );
 		CrosshairPanel?.CreateEvent( "fire" );
 	}
 
@@ -103,8 +116,8 @@ partial class SMG : Weapon
 
 	public override void SimulateAnimator( PawnAnimator anim )
 	{
-		anim.SetParam( "holdtype", 2 ); // TODO this is shit
-		anim.SetParam( "aimat_weight", 1.0f );
+		anim.SetAnimParameter( "holdtype", 2 ); // TODO this is shit
+		anim.SetAnimParameter( "aimat_weight", 1.0f );
 	}
 
 }

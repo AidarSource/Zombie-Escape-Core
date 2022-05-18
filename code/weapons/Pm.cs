@@ -32,7 +32,7 @@ partial class PM : Weapon
 			return;
 		}
 
-		(Owner as AnimEntity).SetAnimBool( "b_attack", true );
+		(Owner as AnimEntity).SetAnimParameter( "b_attack", true );
 
 		//
 		// Tell the clients to play the shoot effects
@@ -61,7 +61,7 @@ partial class PM : Weapon
 			new Sandbox.ScreenShake.Perlin( 0.5f, 4.0f, 0.5f, 0.5f );
 		}
 
-		ViewModelEntity?.SetAnimBool( "fire", true );
+		ViewModelEntity?.SetAnimParameter( "fire", true );
 		CrosshairPanel?.CreateEvent( "fire" );
 	}
 

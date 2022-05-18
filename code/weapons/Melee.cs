@@ -20,16 +20,16 @@ partial class Knife : Weapon
 	}
 	public override void MeleeStrike( float damage, float force )
 	{
-		var forward = Owner.EyeRot.Forward;
+		var forward = Owner.EyeRotation.Forward;
 		forward = forward.Normal;
-		foreach ( var tr in TraceBullet( Owner.EyePos, Owner.EyePos + forward * MeleeDistance, 10f ) )
+		foreach ( var tr in TraceBullet( Owner.EyePosition, Owner.EyePosition + forward * MeleeDistance, 10f ) )
 		{
 			if ( !tr.Entity.IsValid() ) continue;
 			tr.Surface.DoBulletImpact( tr );
 			if ( !IsServer ) continue;
 			using ( Prediction.Off() )
 			{
-				var damageInfo = DamageInfo.FromBullet( tr.EndPos, forward * 120 * force, damage )
+				var damageInfo = DamageInfo.FromBullet( tr.EndPosition, forward * 120 * force, damage )
 					.UsingTraceResult( tr )
 					.WithAttacker( Owner )
 					.WithWeapon( this );
@@ -54,18 +54,18 @@ partial class Knife : Weapon
 			new Sandbox.ScreenShake.Perlin();
 		}
 
-		(Owner as AnimEntity).SetAnimBool( "b_attack", true );
-		ViewModelEntity?.SetAnimBool( "fire", true );
+		(Owner as AnimEntity).SetAnimParameter( "b_attack", true );
+		ViewModelEntity?.SetAnimParameter( "fire", true );
 		CrosshairPanel?.CreateEvent( "fire" );
 	}
 
 	public override void SimulateAnimator( PawnAnimator anim )
 	{
-		anim.SetParam( "holdtype", 4 );
-		anim.SetParam( "aimat_weight", 1.0f );
-		anim.SetParam( "holdtype_attack", 2.0f );
-		anim.SetParam( "holdtype_handedness", 1 );
-		anim.SetParam( "holdtype_pose", 0f );
+		anim.SetAnimParameter( "holdtype", 4 );
+		anim.SetAnimParameter( "aimat_weight", 1.0f );
+		anim.SetAnimParameter( "holdtype_attack", 2.0f );
+		anim.SetAnimParameter( "holdtype_handedness", 1 );
+		anim.SetAnimParameter( "holdtype_pose", 0f );
 	}
 
 }
