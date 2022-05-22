@@ -88,7 +88,7 @@ public partial class Weapon : BaseWeapon, IUse
 
 		IsReloading = true;
 
-		(Owner as AnimEntity)?.SetAnimParameter( "b_reload", true );
+		(Owner as AnimatedEntity)?.SetAnimParameter( "b_reload", true );
 
 		StartReloadEffects();
 	}
@@ -217,11 +217,13 @@ public partial class Weapon : BaseWeapon, IUse
 
 		if (IsLocalPawn)
 		{
-			_ = new Sandbox.ScreenShake.Perlin();
+			// Need to implement ScreenShake method
+			//_ = new Sandbox.ScreenShake.Perlin();
 		}
 
 		ViewModelEntity?.SetAnimParameter( "fire", true );
-		CrosshairPanel?.CreateEvent( "fire" );
+		// Need to implement ScreenShake method
+		//CrosshairPanel?.CreateEvent( "fire" );
 	}
 
 	/// <summary>
@@ -270,7 +272,7 @@ public partial class Weapon : BaseWeapon, IUse
 					return;
 				}
 
-				DebugOverlay.ScreenText( 2, ZombieKnockback.ToString() );
+				DebugOverlay.ScreenText( ZombieKnockback.ToString(), 2 );
 				tr.Entity.Velocity = forward * ZombieKnockback;
 				//tr.Entity.Health = 700000;
 			}

@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 
-[Library( "weapon_fists", Title = "Fists", Spawnable = false )]
+[Library( "weapon_fists", Title = "Fists" )]
+[Spawnable]
 partial class Fists : Weapon
 {
 	public override string ViewModelPath => "models/first_person/first_person_arms.vmdl";
@@ -23,7 +24,7 @@ partial class Fists : Weapon
 			OnMeleeMiss( leftHand );
 		}
 
-		(Owner as AnimEntity)?.SetAnimParameter( "b_attack", true );
+		(Owner as AnimatedEntity)?.SetAnimParameter( "b_attack", true );
 	}
 
 	public override void AttackPrimary()

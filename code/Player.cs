@@ -115,14 +115,14 @@ partial class ZePlayer : Player
 			//SetTeam( Team.Zombies );
 			((ZeCore)ZeCore.Current).Zombies++;
 			Inventory.Add( new Fists(), true );
-			DebugOverlay.ScreenText( 9, "You're zombie!", 5.0f );
+			DebugOverlay.ScreenText( "You're zombie!", 9, 5.0f );
 			this.Health = 5000;
 			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
 			Log.Info( " team: " + this.Team.GetName() );
 		} else
 		{
 			Log.Info( "(Team Initialization) Success" );
-			DebugOverlay.ScreenText( 10, "You're human!", 5.0f );
+			DebugOverlay.ScreenText( "You're human!", 5.0f );
 			Log.Info( "Respawn Succesful" );
 			Log.Info( " team: " + this.Team.GetName() );
 
@@ -148,7 +148,7 @@ partial class ZePlayer : Player
 	}
 
 
-	[ServerCmd]
+	[ConCmd.Server]
 	public static void SwitchTeam()
 	{
 		if ( ConsoleSystem.Caller.Pawn is ZePlayer player )
@@ -181,8 +181,8 @@ partial class ZePlayer : Player
 			return;
 
 
-		DebugOverlay.ScreenText( 3, "Humans: " + ((ZeCore)ZeCore.Current).Humans.ToString() );
-		DebugOverlay.ScreenText( 4, "Zombies: " + ((ZeCore)ZeCore.Current).Zombies.ToString() );
+		DebugOverlay.ScreenText( "Humans: " + ((ZeCore)ZeCore.Current).Humans.ToString(), 3 );
+		DebugOverlay.ScreenText( "Zombies: " + ((ZeCore)ZeCore.Current).Zombies.ToString(), 4 );
 
 
 		
@@ -250,7 +250,7 @@ partial class ZePlayer : Player
 
 		if (GroundEntity != null)
 		{
-			DebugOverlay.ScreenText(1, "Ground" );
+			DebugOverlay.ScreenText( "Ground", 1 );
 		}
 
 		// Press two times space for Noclip

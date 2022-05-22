@@ -2,7 +2,7 @@
 using System;
 
 [Library( "dm_knife", Title = "Knife" )]
-[Hammer.EditorModel( "weapons/machete/machate.vmdl" )]
+[EditorModel( "weapons/machete/machate.vmdl" )]
 partial class Knife : Weapon
 {
 	//public override string ViewModelPath => "weapons/rust_boneknife/v_rust_boneknife.vmdl";
@@ -51,12 +51,14 @@ partial class Knife : Weapon
 
 		if ( IsLocalPawn )
 		{
-			new Sandbox.ScreenShake.Perlin();
+			// Need to implement ScreenShake method
+			//new Sandbox.ScreenShake.Perlin();
 		}
 
-		(Owner as AnimEntity).SetAnimParameter( "b_attack", true );
+		(Owner as AnimatedEntity).SetAnimParameter( "b_attack", true );
 		ViewModelEntity?.SetAnimParameter( "fire", true );
-		CrosshairPanel?.CreateEvent( "fire" );
+		// Need to implement crosshair
+		//CrosshairPanel?.CreateEvent( "fire" );
 	}
 
 	public override void SimulateAnimator( PawnAnimator anim )

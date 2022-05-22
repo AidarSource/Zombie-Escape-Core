@@ -2,7 +2,7 @@
 using System;
 
 [Library( "dm_rifle", Title = "AK74" )]
-[Hammer.EditorModel( "weapons/ak74/w_ak74.vmdl" )]
+[EditorModel( "weapons/ak74/w_ak74.vmdl" )]
 partial class AK74 : Weapon
 {
 	public override string ViewModelPath => "weapons/ak74/v_ak74.vmdl";
@@ -38,7 +38,7 @@ partial class AK74 : Weapon
 			return;
 		}
 
-		(Owner as AnimEntity).SetAnimParameter( "b_attack", true );
+		(Owner as AnimatedEntity).SetAnimParameter( "b_attack", true );
 
 		//
 		// Tell the clients to play the shoot effects
@@ -64,11 +64,13 @@ partial class AK74 : Weapon
 
 		if ( Owner == Local.Pawn )
 		{
-			new Sandbox.ScreenShake.Perlin( 0.5f, 4.0f, 0.5f, 0.5f );
+			// Need to implement ScreenShake method
+			//new Sandbox.ScreenShake.Perlin( 0.5f, 4.0f, 0.5f, 0.5f );
 		}
 
 		ViewModelEntity?.SetAnimParameter( "fire", true );
-		CrosshairPanel?.CreateEvent( "fire" );
+		// Need to implement crosshair
+		//CrosshairPanel?.CreateEvent( "fire" );
 	}
 
 	public override void SimulateAnimator( PawnAnimator anim )

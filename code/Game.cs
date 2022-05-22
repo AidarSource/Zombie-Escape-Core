@@ -45,8 +45,8 @@ public partial class ZeCore : Game
 
 	public override void Simulate( Client cl )
 	{
-		DebugOverlay.ScreenText( 11, "Human Win rounds: " + HumanWinRounds );
-		DebugOverlay.ScreenText( 12, "Zombie Win rounds: " + ZombieWinRounds );
+		DebugOverlay.ScreenText( "Human Win rounds: " + HumanWinRounds, 11 );
+		DebugOverlay.ScreenText( "Zombie Win rounds: " + ZombieWinRounds, 12 );
 		base.Simulate( cl );
 	}
 
@@ -185,7 +185,7 @@ public partial class ZeCore : Game
 		LastLastRoundZombies_Collection = LastRoundMZM;
 	}
 
-	[ServerCmd( "ze_switch_teams" )]
+	[ConCmd.Server( "ze_switch_teams" )]
 	public static void SwitchTeams()
 	{
 		if ( ConsoleSystem.Caller.Pawn is ZePlayer player )
