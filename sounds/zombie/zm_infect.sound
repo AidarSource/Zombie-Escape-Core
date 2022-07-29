@@ -2,9 +2,18 @@
 {
 	data = 
 	{
+		UI = false
+		Volume = 0.08
+		VolumeRandom = 0
+		Pitch = 1
+		PitchRandom = 0
+		Decibels = 70
 		Sounds = 
 		[
-			"sounds/zombie/zombie_scream.vsnd",
+			resource:"sounds/zombie/zombie_scream.vsnd",
 		]
+		SelectionMode = "Random"
+		MaximumDistance = 1143.9335
+		MinimumDistance = 57.196674
 	}
 }

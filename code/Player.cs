@@ -40,7 +40,7 @@ partial class ZePlayer : Player
 		await GameTask.DelaySeconds( 0.01f );
 
 
-		Inventory.Add( new Knife(), true );
+		Inventory.Add( new Fists(), true );
 		Health = 5000;
 		Sound.FromEntity( "zm_infect", this );
 		this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
@@ -272,7 +272,7 @@ partial class ZePlayer : Player
 	public override void TakeDamage( DamageInfo info )
 	{
 		LastDamage = info;
-		if ( !Tags.Has("zombie") && info.Weapon is Knife)
+		if ( !Tags.Has("zombie") && info.Weapon is Fists)
 		{
 			Infector();
 		}

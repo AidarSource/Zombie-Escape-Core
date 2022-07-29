@@ -66,7 +66,7 @@ public partial class ViewModel : BaseViewModel
 
 		Sway( ref camSetup );
 
-		ViewmodelBreathe( ref camSetup );
+		//ViewmodelBreathe( ref camSetup );
 		ViewmodelBob( ref camSetup );
 		JumpOffset( ref camSetup );
 		MoveOffset( ref camSetup );

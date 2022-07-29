@@ -57,14 +57,6 @@ ammo {
 	color: white;
 	//mix-blend-mode: lighten;
 	font-family: DejaVu Sans Mono, monospace;
-
-	label {
-		text-shadow: 0px 0px 20px #f70a;
-
-		&.danger {
-			color: #f00;
-		}
-	}
 }
 
 Health {
