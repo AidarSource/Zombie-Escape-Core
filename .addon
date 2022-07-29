@@ -10,5 +10,9 @@
   "HasCode": true,
   "CodePath": "code",
   "RootNamespace": "Sandbox",
-  "Metadata": {}
+  "Metadata": {
+    "MapList": [
+      "facepunch.construct"
+    ]
+  }
 }
