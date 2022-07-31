@@ -48,6 +48,10 @@ partial class Pistol : Weapon
 		PlaySound( "rust_pistol.shoot" );
 		ShootBullet( 0.05f, 1.5f, 1.0f, 3.0f );
 
+		if ( AmmoClip == 0 )
+		{
+			Reload();
+		}
 	}
 
 	private void Discharge()
