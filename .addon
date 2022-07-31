@@ -1,7 +1,7 @@
 {
   "Title": "Zombie Escape",
   "Type": "game",
-  "Org": "local",
+  "Org": "switchback",
   "Ident": "zombie-escape",
   "Schema": 1,
   "HasAssets": true,
@@ -13,6 +13,17 @@
   "Metadata": {
     "MapList": [
       "facepunch.construct"
-    ]
+    ],
+    "MaxPlayers": 256,
+    "MinPlayers": 1,
+    "GameNetworkType": "Multiplayer",
+    "MapSelect": "Unrestricted",
+    "RankType": "None",
+    "PerMapRanking": false,
+    "LeaderboardType": "None",
+    "GameCategory": "Survival",
+    "ControlModes": {
+      "Keyboard": true
+    }
   }
 }
