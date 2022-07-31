@@ -11,7 +11,13 @@ public partial class MotherZM : Panel
 	public override void Tick()
 	{
 		SetClass( "hidden", ((ZeCore)ZeCore.Current).CounterToMotherZombie <= 0 );
-		Label.Text = $"Zombie infection starts in {((ZeCore)ZeCore.Current).CounterToMotherZombie} seconds.";
+		if( ((ZeCore)ZeCore.Current).Humans + ((ZeCore)ZeCore.Current).Zombies < 2 )
+		{
+			Label.Text = "Waiting for players";
+		} else
+		{
+			Label.Text = $"Zombie infection starts in {((ZeCore)ZeCore.Current).CounterToMotherZombie} seconds.";
+		}
 	}
 }
 
