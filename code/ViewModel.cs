@@ -135,6 +135,7 @@ public partial class ViewModel : BaseViewModel
 	protected virtual void ViewmodelBob( ref CameraSetup cameraSetup )
 	{
 		var speed = Owner.Velocity.Length.LerpInverse( 0, 240 );
+		speed /= 1.5f;
 		dampedSpeed = dampedSpeed.LerpTo( speed, 2 * Time.Delta );
 		walkBobScale = walkBobScale.LerpTo( Local.Pawn.GroundEntity != null ? speed : 0, 10 * Time.Delta );
 		walkBobDelta += Time.Delta * 15.0f * walkBobScale;
