@@ -9,7 +9,7 @@ public partial class Weapon : BaseWeapon, IUse
 	public int AmmoClip { get; set; }
 	public virtual float ReloadTime => 3.0f;
 	public virtual int ClipSize => 12;
-	private float ZombieKnockback = 300.0f;
+	private float ZombieKnockback = 200.0f;
 	private float ZombieOnAirKnockback = 5.0f;
 	public virtual int Bucket => 1;
 	public virtual int BucketWeight => 10;
@@ -222,6 +222,7 @@ public partial class Weapon : BaseWeapon, IUse
 		}
 
 		ViewModelEntity?.SetAnimParameter( "fire", true );
+		CrosshairLastShoot = 0;
 		// Need to implement ScreenShake method
 		//CrosshairPanel?.CreateEvent( "fire" );
 	}
@@ -278,7 +279,7 @@ public partial class Weapon : BaseWeapon, IUse
 			}
 
 			//DebugOverlay.ScreenText( tr.Entity.GetType(), 1.0f );
-			Log.Info( tr.Entity.GetType() );
+			//Log.Info( tr.Entity.GetType() );
 		}
 	}
 
@@ -323,5 +324,23 @@ public partial class Weapon : BaseWeapon, IUse
 				tr.Entity.TakeDamage( damageInfo );
 			}
 		}
+	}
+
+	protected TimeSince CrosshairLastShoot { get; set; }
+	protected TimeSince CrosshairLastReload { get; set; }
+
+	public virtual void RenderHud( in Vector2 screensize )
+	{
+		var center = screensize * 0.5f;
+
+		if ( IsReloading || (AmmoClip == 0 && ClipSize > 1) )
+			CrosshairLastReload = 0;
+
+		RenderCrosshair( center, CrosshairLastShoot.Relative, CrosshairLastReload.Relative );
+	}
+
+	public virtual void RenderCrosshair( in Vector2 center, float lastAttack, float lastReload )
+	{
+		var draw = Render.Draw2D;
 	}
 }
