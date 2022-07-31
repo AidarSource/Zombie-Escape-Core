@@ -12,7 +12,7 @@ public partial class ZeCore : Game
 	// ...
 	// Mother Zombie Variables
 	// ...
-	[Net] public int CounterToMotherZombie { get; set; } = 239139219;
+	[Net] public int CounterToMotherZombie { get; set; } = 13;
 	[Net] public float MotherZombie_SpawnRate { get; set; } = 0.1f;
 	public byte CounterToClear_LastLastMZM_List = 0;
 	public bool ItsFirstRound = true;
@@ -202,6 +202,7 @@ public partial class ZeCore : Game
 	public async Task RoundOver()
 	{
 		await GameTask.DelaySeconds( 7.0f );
+		CounterToMotherZombie = 13;
 		RoundCounter = 0;
 
 		Humans = 0;
@@ -218,6 +219,10 @@ public partial class ZeCore : Game
 			{
 				player.Tags.Remove( "zombie" );
 			}
+			//if ( player.Tags.Has( "human" ) )
+			//{
+			//	player.Tags.Remove( "human" );
+			//}
 
 			RoundStatusCheck = false;
 
@@ -236,5 +241,25 @@ public partial class ZeCore : Game
 
 		CounterToMotherZombie = 20;
 		await MotherZombie();
+	}
+
+	public override void RenderHud()
+	{
+		var localPawn = Local.Pawn as ZePlayer;
+		if ( localPawn == null ) return;
+
+		//
+		// scale the screen using a matrix, so the scale math doesn't invade everywhere
+		// (other than having to pass the new scale around)
+		//
+
+		var scale = Screen.Height / 1080.0f;
+		var screenSize = Screen.Size / scale;
+		var matrix = Matrix.CreateScale( scale );
+
+		using ( Render.Draw2D.MatrixScope( matrix ) )
+		{
+			localPawn.RenderHud( screenSize );
+		}
 	}
 }
