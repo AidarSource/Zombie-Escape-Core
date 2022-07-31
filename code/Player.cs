@@ -12,6 +12,8 @@ partial class ZePlayer : Player
 
 	private int counter = 20;
 
+	private DamageInfo lastDamage;
+
 	private TimeSince LocalTimeSince;
 
 	private bool IsZombie = false;
@@ -39,11 +41,11 @@ partial class ZePlayer : Player
 		}
 		await GameTask.DelaySeconds( 0.01f );
 
-
 		Inventory.Add( new Fists(), true );
 		Health = 5000;
 		Sound.FromEntity( "zm_infect", this );
 		this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
+		SetTeam( Team.Zombies );
 	}
 
 
@@ -52,7 +54,7 @@ partial class ZePlayer : Player
 		MainCamera = new FirstPersonCamera();
 		LastCamera = MainCamera;
 
-		if( !((ZeCore)ZeCore.Current).OnlyOnce )
+		if( !((ZeCore)ZeCore.Current).OnlyOnce && ((ZeCore)ZeCore.Current).Humans + ((ZeCore)ZeCore.Current).Zombies > 0 )
 		{
 			((ZeCore)ZeCore.Current).OnlyOnce = true;
 			//MotherZombie();
@@ -64,17 +66,14 @@ partial class ZePlayer : Player
 			Event.Run( ZeEvent.Player.InitialSpawn, Client );
 		}
 
-		if( ((ZeCore)ZeCore.Current).CounterToMotherZombie == 0 )
-		{
-			//IsZombie = true;
-			Tags.Add( "zombie" );
-			this.Health = 5000;
-			SetTeam( Team.Zombies );
-		} else
-		{
-			Tags.Add( "human" );
-			//SwitchTeam();
-		}
+		//if ( ((ZeCore)ZeCore.Current).CounterToMotherZombie == 0 )
+		//{
+		//	Tags.Add( "zombie" );
+		//}
+		//else
+		//{
+		//	Tags.Add( "human" );
+		//}
 
 		base.Spawn();
 
@@ -85,7 +84,15 @@ partial class ZePlayer : Player
 		SetModel( "models/citizen/citizen.vmdl" );
 
 		// Use WalkController for movement (you can make your own PlayerController for 100% control)
-		Controller = new WalkController();
+		Controller = new WalkController()
+		{
+			WalkSpeed = 250,
+			DefaultSpeed = 250,
+			SprintSpeed = 150,
+			AirAcceleration = 30
+			//Acceleration = 5,
+			//GroundFriction = 4
+		};
 
 		// Use StandardPlayerAnimator  (you can make your own PlayerAnimator for 100% control)
 		Animator = new StandardPlayerAnimator();
@@ -110,21 +117,16 @@ partial class ZePlayer : Player
 		}
 
 
-		if( Tags.Has("zombie") )
+		if ( Tags.Has("zombie") || ((ZeCore)ZeCore.Current).CounterToMotherZombie == 0 )
 		{
-			//SetTeam( Team.Zombies );
+			SetTeam( Team.Zombies );
 			((ZeCore)ZeCore.Current).Zombies++;
 			Inventory.Add( new Fists(), true );
-			DebugOverlay.ScreenText( "You're zombie!", 9, 5.0f );
 			this.Health = 5000;
 			this.RenderColor = new Color32( (byte)(105 + Rand.Int( 20 )), (byte)(174 + Rand.Int( 20 )), (byte)(59 + Rand.Int( 20 )), 255 ).ToColor();
-			Log.Info( " team: " + this.Team.GetName() );
-		} else
+		} else if( Tags.Has("human") && ((ZeCore)ZeCore.Current).CounterToMotherZombie > 0 )
 		{
-			Log.Info( "(Team Initialization) Success" );
-			DebugOverlay.ScreenText( "You're human!", 5.0f );
-			Log.Info( "Respawn Succesful" );
-			Log.Info( " team: " + this.Team.GetName() );
+			SetTeam( Team.Humans );
 
 			((ZeCore)ZeCore.Current).Humans++;
 			Inventory.Add( new PM(), true );
@@ -134,6 +136,22 @@ partial class ZePlayer : Player
 			Inventory.Add( new AK47() );
 
 			
+			// basic citizen color
+			this.RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
+		} else
+		{
+			SetTeam( Team.Humans );
+			Tags.Add( "human" );
+
+			((ZeCore)ZeCore.Current).Humans++;
+			Inventory.Add( new PM(), true );
+			Inventory.Add( new Shotgun() );
+			Inventory.Add( new SMG() );
+			Inventory.Add( new AK74() );
+			Inventory.Add( new AK47() );
+			Log.Info( "ELSE BLOCK ACTIVATED" );
+
+
 			// basic citizen color
 			this.RenderColor = new Color32( 255, 255, 255, 255 ).ToColor();
 		}
@@ -147,6 +165,36 @@ partial class ZePlayer : Player
 		base.Respawn();
 	}
 
+	public override void OnKilled()
+	{
+		base.OnKilled();
+
+		if( ((ZeCore)ZeCore.Current).Zombies > 0  )
+		{
+			this.Tags.Remove( "human" );
+			this.Tags.Add( "zombie" );
+			SetTeam( Team.Zombies );
+			((ZeCore)ZeCore.Current).Humans--;
+		}
+
+		BecomeRagdollOnClient( Velocity, lastDamage.Flags, lastDamage.Position, lastDamage.Force, GetHitboxBone( lastDamage.HitboxIndex ) );
+
+		Controller = null;
+
+		EnableAllCollisions = false;
+		EnableDrawing = false;
+
+		CameraMode = new SpectateRagdollCamera();
+
+		foreach ( var child in Children )
+		{
+			child.EnableDrawing = false;
+		}
+
+
+		Inventory.DeleteContents();
+	}
+
 
 	[ConCmd.Server]
 	public static void SwitchTeam()
@@ -157,10 +205,14 @@ partial class ZePlayer : Player
 			var currentTeam = player.Team;
 
 			if ( currentTeam == Team.Zombies )
+			{
 				targetTeam = Team.Humans;
+				
+			}
+			
 
 			player.SetTeam( targetTeam );
-			player.Respawn();
+			//player.Respawn();
 
 		}
 	}
@@ -227,13 +279,15 @@ partial class ZePlayer : Player
 
 		if(Input.Pressed(InputButton.Flashlight))
 		{
-			//Sound.FromEntity( "ayayo", this );
-			//SwitchTeam(cl);
+			Sound.FromEntity( "ayayo", this );
+			//SwitchTeam( );
 			//Log.Info( "Team: " + this.Team.GetName() );
 			//ZePlayer.SwitchTeam();
+
+
 			Log.Info( cl.GetInt( "team" ) );
 			//cl.SetInt( "team", 2 );
-			cl.SetInt( "team", (int)Team.Humans );
+			//cl.SetInt( "team", (int)Team.Humans );
 		}
 
 		if ( Input.Pressed( InputButton.Drop ) )
@@ -303,6 +357,17 @@ partial class ZePlayer : Player
 		DamageIndicator.Current?.OnHit( pos );
 	}
 
+	public void RenderHud( Vector2 screenSize )
+	{
+		if ( LifeState != LifeState.Alive )
+			return;
 
+		// RenderOverlayTest( screenSize );
+
+		if ( ActiveChild is Weapon weapon )
+		{
+			weapon.RenderHud( screenSize );
+		}
+	}
 }
 
